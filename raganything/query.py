@@ -63,9 +63,7 @@ class QueryMixin:
                             and isinstance(value, str)
                             and len(value) > 200
                         ):
-                            normalized_item[f"{key}_hash"] = hashlib.md5(
-                                value.encode()
-                            ).hexdigest()
+                            normalized_item[f"{key}_hash"] = hashlib.md5(value.encode()).hexdigest()
                         else:
                             normalized_item[key] = value
                     normalized_content.append(normalized_item)
@@ -122,17 +120,10 @@ class QueryMixin:
 
         # Auto-determine VLM enhanced based on availability
         if vlm_enhanced is None:
-            vlm_enhanced = (
-                hasattr(self, "vision_model_func")
-                and self.vision_model_func is not None
-            )
+            vlm_enhanced = hasattr(self, "vision_model_func") and self.vision_model_func is not None
 
         # Use VLM enhanced query if enabled and available
-        if (
-            vlm_enhanced
-            and hasattr(self, "vision_model_func")
-            and self.vision_model_func
-        ):
+        if vlm_enhanced and hasattr(self, "vision_model_func") and self.vision_model_func:
             return await self.aquery_vlm_enhanced(query, mode=mode, **kwargs)
         elif vlm_enhanced and (
             not hasattr(self, "vision_model_func") or not self.vision_model_func
@@ -208,9 +199,7 @@ class QueryMixin:
             return await self.aquery(query, mode=mode, **kwargs)
 
         # Generate cache key for multimodal query
-        cache_key = self._generate_multimodal_cache_key(
-            query, multimodal_content, mode, **kwargs
-        )
+        cache_key = self._generate_multimodal_cache_key(query, multimodal_content, mode, **kwargs)
 
         # Check cache if available and enabled
         cached_result = None
@@ -220,31 +209,21 @@ class QueryMixin:
             and hasattr(self.lightrag, "llm_response_cache")
             and self.lightrag.llm_response_cache
         ):
-            if self.lightrag.llm_response_cache.global_config.get(
-                "enable_llm_cache", True
-            ):
+            if self.lightrag.llm_response_cache.global_config.get("enable_llm_cache", True):
                 try:
-                    cached_result = await self.lightrag.llm_response_cache.get_by_id(
-                        cache_key
-                    )
+                    cached_result = await self.lightrag.llm_response_cache.get_by_id(cache_key)
                     if cached_result and isinstance(cached_result, dict):
                         result_content = cached_result.get("return")
                         if result_content:
-                            self.logger.info(
-                                f"Multimodal query cache hit: {cache_key[:16]}..."
-                            )
+                            self.logger.info(f"Multimodal query cache hit: {cache_key[:16]}...")
                             return result_content
                 except Exception as e:
                     self.logger.debug(f"Error accessing multimodal query cache: {e}")
 
         # Process multimodal content to generate enhanced query text
-        enhanced_query = await self._process_multimodal_query_content(
-            query, multimodal_content
-        )
+        enhanced_query = await self._process_multimodal_query_content(query, multimodal_content)
 
-        self.logger.info(
-            f"Generated enhanced query length: {len(enhanced_query)} characters"
-        )
+        self.logger.info(f"Generated enhanced query length: {len(enhanced_query)} characters")
 
         # Execute enhanced query
         result = await self.aquery(enhanced_query, mode=mode, **kwargs)
@@ -256,9 +235,7 @@ class QueryMixin:
             and hasattr(self.lightrag, "llm_response_cache")
             and self.lightrag.llm_response_cache
         ):
-            if self.lightrag.llm_response_cache.global_config.get(
-                "enable_llm_cache", True
-            ):
+            if self.lightrag.llm_response_cache.global_config.get("enable_llm_cache", True):
                 try:
                     # Create cache entry for multimodal query
                     cache_entry = {
@@ -269,12 +246,8 @@ class QueryMixin:
                         "mode": mode,
                     }
 
-                    await self.lightrag.llm_response_cache.upsert(
-                        {cache_key: cache_entry}
-                    )
-                    self.logger.info(
-                        f"Saved multimodal query result to cache: {cache_key[:16]}..."
-                    )
+                    await self.lightrag.llm_response_cache.upsert({cache_key: cache_entry})
+                    self.logger.info(f"Saved multimodal query result to cache: {cache_key[:16]}...")
                 except Exception as e:
                     self.logger.debug(f"Error saving multimodal query to cache: {e}")
 
@@ -327,10 +300,14 @@ class QueryMixin:
 
         self.logger.debug("Retrieved raw prompt from LightRAG")
 
+        # Check if raw_prompt is None or empty
+        if not raw_prompt or not isinstance(raw_prompt, str):
+            self.logger.warning("Raw prompt is None or not a string, falling back to normal query")
+            query_param = QueryParam(mode=mode, **kwargs)
+            return await self.lightrag.aquery(query, param=query_param)
+
         # 2. Extract and process image paths
-        enhanced_prompt, images_found = await self._process_image_paths_for_vlm(
-            raw_prompt
-        )
+        enhanced_prompt, images_found = await self._process_image_paths_for_vlm(raw_prompt)
 
         if not images_found:
             self.logger.info("No valid images found, falling back to normal query")
@@ -369,7 +346,7 @@ class QueryMixin:
         for i, content in enumerate(multimodal_content):
             content_type = content.get("type", "unknown")
             self.logger.info(
-                f"Processing {i+1}/{len(multimodal_content)} multimodal content: {content_type}"
+                f"Processing {i + 1}/{len(multimodal_content)} multimodal content: {content_type}"
             )
 
             try:
@@ -381,15 +358,11 @@ class QueryMixin:
                     description = await self._generate_query_content_description(
                         processor, content, content_type
                     )
-                    enhanced_parts.append(
-                        f"\nRelated {content_type} content: {description}"
-                    )
+                    enhanced_parts.append(f"\nRelated {content_type} content: {description}")
                 else:
                     # If no appropriate processor, use basic description
                     basic_desc = str(content)[:200]
-                    enhanced_parts.append(
-                        f"\nRelated {content_type} content: {basic_desc}"
-                    )
+                    enhanced_parts.append(f"\nRelated {content_type} content: {basic_desc}")
 
             except Exception as e:
                 self.logger.error(f"Error processing multimodal content: {str(e)}")
@@ -424,17 +397,13 @@ class QueryMixin:
             elif content_type == "equation":
                 return await self._describe_equation_for_query(processor, content)
             else:
-                return await self._describe_generic_for_query(
-                    processor, content, content_type
-                )
+                return await self._describe_generic_for_query(processor, content, content_type)
 
         except Exception as e:
             self.logger.error(f"Error generating {content_type} description: {str(e)}")
             return f"{content_type} content: {str(content)[:100]}"
 
-    async def _describe_image_for_query(
-        self, processor, content: Dict[str, Any]
-    ) -> str:
+    async def _describe_image_for_query(self, processor, content: Dict[str, Any]) -> str:
         """Generate image description for query"""
         image_path = content.get("img_path")
         captions = content.get("image_caption", content.get("img_caption", []))
@@ -463,9 +432,7 @@ class QueryMixin:
 
         return "; ".join(parts) if parts else "Image content information incomplete"
 
-    async def _describe_table_for_query(
-        self, processor, content: Dict[str, Any]
-    ) -> str:
+    async def _describe_table_for_query(self, processor, content: Dict[str, Any]) -> str:
         """Generate table description for query"""
         table_data = content.get("table_data", "")
         table_caption = content.get("table_caption", "")
@@ -480,9 +447,7 @@ class QueryMixin:
 
         return description
 
-    async def _describe_equation_for_query(
-        self, processor, content: Dict[str, Any]
-    ) -> str:
+    async def _describe_equation_for_query(self, processor, content: Dict[str, Any]) -> str:
         """Generate equation description for query"""
         latex = content.get("latex", "")
         equation_caption = content.get("equation_caption", "")
@@ -509,9 +474,7 @@ class QueryMixin:
 
         description = await processor.modal_caption_func(
             prompt,
-            system_prompt=PROMPTS["QUERY_GENERIC_ANALYST_SYSTEM"].format(
-                content_type=content_type
-            ),
+            system_prompt=PROMPTS["QUERY_GENERIC_ANALYST_SYSTEM"].format(content_type=content_type),
         )
 
         return description
@@ -526,6 +489,11 @@ class QueryMixin:
         Returns:
             tuple: (processed prompt, image count)
         """
+        # Validate prompt
+        if not prompt or not isinstance(prompt, str):
+            self.logger.warning("Invalid prompt provided to _process_image_paths_for_vlm")
+            return "", 0
+
         enhanced_prompt = prompt
         images_processed = 0
 
@@ -534,9 +502,7 @@ class QueryMixin:
 
         # Enhanced regex pattern for matching image paths
         # Matches only the path ending with image file extensions
-        image_path_pattern = (
-            r"Image Path:\s*([^\r\n]*?\.(?:jpg|jpeg|png|gif|bmp|webp|tiff|tif))"
-        )
+        image_path_pattern = r"Image Path:\s*([^\r\n]*?\.(?:jpg|jpeg|png|gif|bmp|webp|tiff|tif))"
 
         # First, let's see what matches we find
         matches = re.findall(image_path_pattern, prompt)
@@ -586,15 +552,11 @@ class QueryMixin:
                 return match.group(0)  # Keep original
 
         # Execute replacement
-        enhanced_prompt = re.sub(
-            image_path_pattern, replace_image_path, enhanced_prompt
-        )
+        enhanced_prompt = re.sub(image_path_pattern, replace_image_path, enhanced_prompt)
 
         return enhanced_prompt, images_processed
 
-    def _build_vlm_messages_with_images(
-        self, enhanced_prompt: str, user_query: str
-    ) -> List[Dict]:
+    def _build_vlm_messages_with_images(self, enhanced_prompt: str, user_query: str) -> List[Dict]:
         """
         Build VLM message format, using markers to correspond images with text positions
 
@@ -631,9 +593,7 @@ class QueryMixin:
                 # Find marker number and insert corresponding image
                 marker_match = re.match(r"(\d+)\](.*)", text_part, re.DOTALL)
                 if marker_match:
-                    image_num = (
-                        int(marker_match.group(1)) - 1
-                    )  # Convert to 0-based index
+                    image_num = int(marker_match.group(1)) - 1  # Convert to 0-based index
                     remaining_text = marker_match.group(2)
 
                     # Insert corresponding image
@@ -684,9 +644,7 @@ class QueryMixin:
 
             if isinstance(content, str):
                 # Pure text mode
-                result = await self.vision_model_func(
-                    content, system_prompt=system_prompt
-                )
+                result = await self.vision_model_func(content, system_prompt=system_prompt)
             else:
                 # Multimodal mode - pass complete messages directly to VLM
                 result = await self.vision_model_func(

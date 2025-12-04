@@ -16,7 +16,6 @@ _**Agent (model default, mode Agent)**_
 
 ---
 
-
 檢視專案結構，準備依模板生成試用報告與使用說明。
 
 
@@ -24,7 +23,7 @@ _**Agent (model default, mode Agent)**_
 
 <tool-use data-tool-type="generic" data-tool-name="list_dir">
 <details>
-            <summary>Tool use: **list_directory** • Listed directory undefined • **0** results</summary>
+            <summary>Tool use: **list_dir** • Listed directory undefined • **0** results</summary>
         
 No results found
 </details>
@@ -199,7 +198,6 @@ Directory: **d:\_Code\_GitHub\RAG-Anything-1022** (1 file)
 
 ---
 
-
 讀取關鍵檔案以了解專案詳情：
 
 
@@ -281,7 +279,6 @@ Directory: **d:\_Code\_GitHub\RAG-Anything-1022** (1 file)
 
 ---
 
-
 繼續查看 Azure OpenAI 整合與其他關鍵資訊：
 
 
@@ -353,7 +350,6 @@ Output mode: content
 
 ---
 
-
 建立待辦清單，開始生成兩份文件：
 
 
@@ -401,7 +397,6 @@ Output mode: content
 
 ---
 
-
 生成兩份文件，先從試用報告開始：
 
 
@@ -409,7 +404,7 @@ Output mode: content
 
 <tool-use data-tool-type="write" data-tool-name="write">
 
-<details><summary>Tool use: **code_edit** • Edit file: RAG-Anything-試用報告.md</summary>
+<details><summary>Tool use: **write** • Edit file: RAG-Anything-試用報告.md</summary>
 
 **Chunk 1**
 Lines added: 192, lines removed: 1
@@ -621,7 +616,6 @@ Lines added: 192, lines removed: 1
 
 ---
 
-
 生成使用說明文件：
 
 
@@ -687,7 +681,6 @@ Output mode: content
 
 ---
 
-
 撰寫使用說明文件：
 
 
@@ -695,7 +688,7 @@ Output mode: content
 
 <tool-use data-tool-type="write" data-tool-name="write">
 
-<details><summary>Tool use: **code_edit** • Edit file: RAG-Anything-使用說明.md</summary>
+<details><summary>Tool use: **write** • Edit file: RAG-Anything-使用說明.md</summary>
 
 **Chunk 1**
 Lines added: 663, lines removed: 1
@@ -866,12 +859,12 @@ Lines added: 663, lines removed: 1
 + pip install raganything
 + 
 + # 安裝所有選用功能
-+ pip install &#39;raganything[all]&#39;
++ pip install 'raganything[all]'
 + 
 + # 僅安裝特定功能
-+ pip install &#39;raganything[image]&#39;      # 圖片格式轉換（BMP, TIFF, GIF, WebP）
-+ pip install &#39;raganything[text]&#39;       # 文字檔處理（TXT, MD）
-+ pip install &#39;raganything[image,text]&#39; # 多個功能
++ pip install 'raganything[image]'      # 圖片格式轉換（BMP, TIFF, GIF, WebP）
++ pip install 'raganything[text]'       # 文字檔處理（TXT, MD）
++ pip install 'raganything[image,text]' # 多個功能
 + &#96;&#96;&#96;
 + 
 + #### 方法二：從原始碼安裝
@@ -910,7 +903,7 @@ Lines added: 663, lines removed: 1
 + mineru --version
 + 
 + # 檢查 Python 套件
-+ python -c &quot;from raganything import RAGAnything; rag = RAGAnything(); print(&#39;✅ MinerU 安裝正確&#39; if rag.check_parser_installation() else &#39;❌ MinerU 安裝問題&#39;)&quot;
++ python -c "from raganything import RAGAnything; rag = RAGAnything(); print('✅ MinerU 安裝正確' if rag.check_parser_installation() else '❌ MinerU 安裝問題')"
 + &#96;&#96;&#96;
 + 
 + ### 環境變數設定
@@ -945,14 +938,14 @@ Lines added: 663, lines removed: 1
 + 
 + async def main():
 +     # 設定 API 配置
-+     api_key = &quot;your-api-key&quot;
-+     base_url = &quot;your-base-url&quot;  # 可選
++     api_key = "your-api-key"
++     base_url = "your-base-url"  # 可選
 + 
 +     # 建立 RAGAnything 配置
 +     config = RAGAnythingConfig(
-+         working_dir=&quot;./rag_storage&quot;,
-+         parser=&quot;mineru&quot;,
-+         parse_method=&quot;auto&quot;,
++         working_dir="./rag_storage",
++         parser="mineru",
++         parse_method="auto",
 +         enable_image_processing=True,
 +         enable_table_processing=True,
 +         enable_equation_processing=True,
@@ -961,7 +954,7 @@ Lines added: 663, lines removed: 1
 +     # 定義 LLM 模型函數
 +     def llm_model_func(prompt, system_prompt=None, history_messages=[], **kwargs):
 +         return openai_complete_if_cache(
-+             &quot;gpt-4o-mini&quot;,
++             "gpt-4o-mini",
 +             prompt,
 +             system_prompt=system_prompt,
 +             history_messages=history_messages,
@@ -974,8 +967,8 @@ Lines added: 663, lines removed: 1
 +     def vision_model_func(prompt, system_prompt=None, history_messages=[], image_data=None, messages=None, **kwargs):
 +         if messages:
 +             return openai_complete_if_cache(
-+                 &quot;gpt-4o&quot;,
-+                 &quot;&quot;,
++                 "gpt-4o",
++                 "",
 +                 system_prompt=None,
 +                 history_messages=[],
 +                 messages=messages,
@@ -985,17 +978,17 @@ Lines added: 663, lines removed: 1
 +             )
 +         elif image_data:
 +             return openai_complete_if_cache(
-+                 &quot;gpt-4o&quot;,
-+                 &quot;&quot;,
++                 "gpt-4o",
++                 "",
 +                 system_prompt=None,
 +                 history_messages=[],
 +                 messages=[
-+                     {&quot;role&quot;: &quot;system&quot;, &quot;content&quot;: system_prompt} if system_prompt else None,
++                     {"role": "system", "content": system_prompt} if system_prompt else None,
 +                     {
-+                         &quot;role&quot;: &quot;user&quot;,
-+                         &quot;content&quot;: [
-+                             {&quot;type&quot;: &quot;text&quot;, &quot;text&quot;: prompt},
-+                             {&quot;type&quot;: &quot;image_url&quot;, &quot;image_url&quot;: {&quot;url&quot;: f&quot;data:image/jpeg;base64,{image_data}&quot;}},
++                         "role": "user",
++                         "content": [
++                             {"type": "text", "text": prompt},
++                             {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{image_data}"}},
 +                         ],
 +                     },
 +                 ],
@@ -1012,7 +1005,7 @@ Lines added: 663, lines removed: 1
 +         max_token_size=8192,
 +         func=lambda texts: openai_embed(
 +             texts,
-+             model=&quot;text-embedding-3-large&quot;,
++             model="text-embedding-3-large",
 +             api_key=api_key,
 +             base_url=base_url,
 +         ),
@@ -1028,19 +1021,19 @@ Lines added: 663, lines removed: 1
 + 
 +     # 處理文件
 +     await rag.process_document_complete(
-+         file_path=&quot;path/to/your/document.pdf&quot;,
-+         output_dir=&quot;./output&quot;,
-+         parse_method=&quot;auto&quot;
++         file_path="path/to/your/document.pdf",
++         output_dir="./output",
++         parse_method="auto"
 +     )
 + 
 +     # 查詢處理後的內容
 +     result = await rag.aquery(
-+         &quot;文件中的主要發現是什麼？&quot;,
-+         mode=&quot;hybrid&quot;
++         "文件中的主要發現是什麼？",
++         mode="hybrid"
 +     )
-+     print(&quot;查詢結果:&quot;, result)
++     print("查詢結果:", result)
 + 
-+ if __name__ == &quot;__main__&quot;:
++ if __name__ == "__main__":
 +     asyncio.run(main())
 + &#96;&#96;&#96;
 + 
@@ -1095,10 +1088,10 @@ Lines added: 663, lines removed: 1
 + from lightrag.utils import EmbeddingFunc
 + 
 + # Azure OpenAI 配置
-+ azure_endpoint = &quot;https://your-resource.openai.azure.com&quot;
-+ azure_api_key = &quot;your-azure-api-key&quot;
-+ azure_api_version = &quot;2024-08-01-preview&quot;
-+ azure_deployment = &quot;gpt-4o&quot;
++ azure_endpoint = "https://your-resource.openai.azure.com"
++ azure_api_key = "your-azure-api-key"
++ azure_api_version = "2024-08-01-preview"
++ azure_deployment = "gpt-4o"
 + 
 + # LLM 模型函數（使用 Azure OpenAI）
 + def llm_model_func(prompt, system_prompt=None, history_messages=[], **kwargs):
@@ -1119,10 +1112,10 @@ Lines added: 663, lines removed: 1
 +     max_token_size=8192,
 +     func=lambda texts: openai_embed(
 +         texts,
-+         model=&quot;text-embedding-3-large&quot;,  # 或使用 AZURE_EMBEDDING_DEPLOYMENT
++         model="text-embedding-3-large",  # 或使用 AZURE_EMBEDDING_DEPLOYMENT
 +         api_key=azure_api_key,
 +         base_url=azure_endpoint,
-+         api_version=&quot;2023-05-15&quot;,  # Embedding API 版本
++         api_version="2023-05-15",  # Embedding API 版本
 +     ),
 + )
 + &#96;&#96;&#96;
@@ -1139,10 +1132,10 @@ Lines added: 663, lines removed: 1
 + &#96;&#96;&#96;python
 + # 測試 Azure OpenAI 連線
 + try:
-+     result = llm_model_func(&quot;Hello, world!&quot;)
-+     print(&quot;✅ Azure OpenAI 連線成功&quot;)
++     result = llm_model_func("Hello, world!")
++     print("✅ Azure OpenAI 連線成功")
 + except Exception as e:
-+     print(f&quot;❌ Azure OpenAI 連線失敗: {e}&quot;)
++     print(f"❌ Azure OpenAI 連線失敗: {e}")
 + &#96;&#96;&#96;
 + 
 + ### 故障排除 (Troubleshooting)
@@ -1239,7 +1232,7 @@ Lines added: 663, lines removed: 1
 + - 增加系統記憶體或使用交換空間
 + 
 + **處理速度慢**：
-+ - 啟用 GPU 加速（如果使用 MinerU）：設定 &#96;device=&quot;cuda:0&quot;&#96;
++ - 啟用 GPU 加速（如果使用 MinerU）：設定 &#96;device="cuda:0"&#96;
 + - 增加 &#96;MAX_ASYNC&#96; 值（但需注意 Rate Limit）
 + - 使用更快的儲存後端（如 PostgreSQL 而非本地檔案）
 + 
@@ -1263,17 +1256,17 @@ Lines added: 663, lines removed: 1
 + from lightrag.utils import EmbeddingFunc
 + 
 + async def process_pdf():
-+     api_key = &quot;your-api-key&quot;
++     api_key = "your-api-key"
 +     
 +     config = RAGAnythingConfig(
-+         working_dir=&quot;./rag_storage&quot;,
-+         parser=&quot;mineru&quot;,
-+         parse_method=&quot;auto&quot;,
++         working_dir="./rag_storage",
++         parser="mineru",
++         parse_method="auto",
 +     )
 +     
 +     def llm_model_func(prompt, system_prompt=None, history_messages=[], **kwargs):
 +         return openai_complete_if_cache(
-+             &quot;gpt-4o-mini&quot;,
++             "gpt-4o-mini",
 +             prompt,
 +             system_prompt=system_prompt,
 +             history_messages=history_messages,
@@ -1286,7 +1279,7 @@ Lines added: 663, lines removed: 1
 +         max_token_size=8192,
 +         func=lambda texts: openai_embed(
 +             texts,
-+             model=&quot;text-embedding-3-large&quot;,
++             model="text-embedding-3-large",
 +             api_key=api_key,
 +         ),
 +     )
@@ -1299,12 +1292,12 @@ Lines added: 663, lines removed: 1
 +     
 +     # 處理文件
 +     await rag.process_document_complete(
-+         file_path=&quot;document.pdf&quot;,
-+         output_dir=&quot;./output&quot;
++         file_path="document.pdf",
++         output_dir="./output"
 +     )
 +     
 +     # 查詢
-+     result = await rag.aquery(&quot;文件的主要內容是什麼？&quot;, mode=&quot;hybrid&quot;)
++     result = await rag.aquery("文件的主要內容是什麼？", mode="hybrid")
 +     print(result)
 + 
 + asyncio.run(process_pdf())
@@ -1315,9 +1308,9 @@ Lines added: 663, lines removed: 1
 + &#96;&#96;&#96;python
 + # 批次處理資料夾中的所有 PDF 文件
 + await rag.process_folder_complete(
-+     folder_path=&quot;./documents&quot;,
-+     output_dir=&quot;./output&quot;,
-+     file_extensions=[&quot;.pdf&quot;, &quot;.docx&quot;],
++     folder_path="./documents",
++     output_dir="./output",
++     file_extensions=[".pdf", ".docx"],
 +     recursive=True,
 +     max_workers=4
 + )
@@ -1328,26 +1321,26 @@ Lines added: 663, lines removed: 1
 + &#96;&#96;&#96;python
 + # 查詢包含表格的問題
 + table_result = await rag.aquery_with_multimodal(
-+     &quot;比較這些效能指標與文件內容&quot;,
++     "比較這些效能指標與文件內容",
 +     multimodal_content=[{
-+         &quot;type&quot;: &quot;table&quot;,
-+         &quot;table_data&quot;: &quot;&quot;&quot;Method,Accuracy,Speed
++         "type": "table",
++         "table_data": """Method,Accuracy,Speed
 +                         RAGAnything,95.2%,120ms
-+                         Traditional,87.3%,180ms&quot;&quot;&quot;,
-+         &quot;table_caption&quot;: &quot;效能比較&quot;
++                         Traditional,87.3%,180ms""",
++         "table_caption": "效能比較"
 +     }],
-+     mode=&quot;hybrid&quot;
++     mode="hybrid"
 + )
 + 
 + # 查詢包含公式的問題
 + equation_result = await rag.aquery_with_multimodal(
-+     &quot;解釋這個公式及其與文件內容的關聯&quot;,
++     "解釋這個公式及其與文件內容的關聯",
 +     multimodal_content=[{
-+         &quot;type&quot;: &quot;equation&quot;,
-+         &quot;latex&quot;: &quot;P(d|q) = \\frac{P(q|d) \\cdot P(d)}{P(q)}&quot;,
-+         &quot;equation_caption&quot;: &quot;文件相關性機率&quot;
++         "type": "equation",
++         "latex": "P(d|q) = \\frac{P(q|d) \\cdot P(d)}{P(q)}",
++         "equation_caption": "文件相關性機率"
 +     }],
-+     mode=&quot;hybrid&quot;
++     mode="hybrid"
 + )
 + &#96;&#96;&#96;
 + 
@@ -1377,7 +1370,6 @@ Lines added: 663, lines removed: 1
 
 
 ---
-
 
 檢查是否有錯誤：
 
@@ -1416,7 +1408,6 @@ Lint results
 
 
 ---
-
 
 已根據兩個模板生成兩份文件：
 

@@ -8,7 +8,7 @@ from lightrag.utils import EmbeddingFunc
 from raganything import RAGAnything, RAGAnythingConfig
 
 
-async def main(file_path=None):
+async def main():
     # 設定 API 配置
     api_key = os.getenv("LLM_BINDING_API_KEY")  # 從環境變量獲取 API 金鑰
     base_url = os.getenv("LLM_BINDING_HOST")  # 可選
@@ -101,13 +101,13 @@ async def main(file_path=None):
         embedding_func=embedding_func,
     )
 
-    # 處理文件
-    default_file = "./eval/VS Code AI 擴充套件適用比較.pdf"
-    file_to_process = file_path if file_path else default_file
-    await rag.process_document_complete(
-        file_path=file_to_process,
+    # 處理多個文檔
+    await rag.process_folder_complete(
+        folder_path="./eval/docs",
         output_dir="./output",
-        parse_method="auto",
+        file_extensions=[".pdf", ".png", ".docx", ".pptx"],
+        recursive=True,
+        max_workers=4,
     )
 
     # 查詢處理後的內容
@@ -115,31 +115,6 @@ async def main(file_path=None):
     text_result = await rag.aquery("文件的主要內容是什麼？", mode="hybrid")
     print("文字查詢結果:", text_result)
 
-    # 多模態查詢 - 包含具體多模態內容的查詢
-    multimodal_result = await rag.aquery_with_multimodal(
-        "分析這個效能資料並解釋與現有文件內容的關係",
-        multimodal_content=[
-            {
-                "type": "table",
-                "table_data": """系統,準確率,F1分數
-                            RAGAnything,95.2%,0.94
-                            基準方法,87.3%,0.85""",
-                "table_caption": "效能對比結果",
-            }
-        ],
-        mode="hybrid",
-    )
-    print("多模態查詢結果:", multimodal_result)
-
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="RAGAnything 文件處理與查詢工具")
-    parser.add_argument(
-        "--file",
-        "-f",
-        type=str,
-        default=None,
-        help="要處理的檔案路徑（預設：./eval/VS Code AI 擴充套件適用比較.pdf）",
-    )
-    args = parser.parse_args()
-    asyncio.run(main(file_path=args.file))
+    asyncio.run(main())
