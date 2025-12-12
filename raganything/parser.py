@@ -11,22 +11,21 @@ For Office documents (.doc, .docx, .ppt, .pptx), please convert them to PDF form
 
 from __future__ import annotations
 
-
-import json
 import argparse
 import base64
+import json
+import logging
 import subprocess
 import tempfile
-import logging
 from pathlib import Path
 from typing import (
+    Any,
     Dict,
     List,
     Optional,
-    Union,
     Tuple,
-    Any,
     TypeVar,
+    Union,
 )
 
 T = TypeVar("T")
@@ -38,9 +37,7 @@ class MineruExecutionError(Exception):
     def __init__(self, return_code, error_msg):
         self.return_code = return_code
         self.error_msg = error_msg
-        super().__init__(
-            f"Mineru command failed with return code {return_code}: {error_msg}"
-        )
+        super().__init__(f"Mineru command failed with return code {return_code}: {error_msg}")
 
 
 class Parser:
@@ -63,9 +60,7 @@ class Parser:
         pass
 
     @staticmethod
-    def convert_office_to_pdf(
-        doc_path: Union[str, Path], output_dir: Optional[str] = None
-    ) -> Path:
+    def convert_office_to_pdf(doc_path: Union[str, Path], output_dir: Optional[str] = None) -> Path:
         """
         Convert Office document (.doc, .docx, .ppt, .pptx, .xls, .xlsx) to PDF.
         Requires LibreOffice to be installed.
@@ -130,13 +125,9 @@ class Parser:
 
                         # Hide console window on Windows
                         if platform.system() == "Windows":
-                            convert_subprocess_kwargs["creationflags"] = (
-                                subprocess.CREATE_NO_WINDOW
-                            )
+                            convert_subprocess_kwargs["creationflags"] = subprocess.CREATE_NO_WINDOW
 
-                        result = subprocess.run(
-                            convert_cmd, **convert_subprocess_kwargs
-                        )
+                        result = subprocess.run(convert_cmd, **convert_subprocess_kwargs)
 
                         if result.returncode == 0:
                             conversion_successful = True
@@ -145,17 +136,13 @@ class Parser:
                             )
                             break
                         else:
-                            logging.warning(
-                                f"LibreOffice command '{cmd}' failed: {result.stderr}"
-                            )
+                            logging.warning(f"LibreOffice command '{cmd}' failed: {result.stderr}")
                     except FileNotFoundError:
                         logging.warning(f"LibreOffice command '{cmd}' not found")
                     except subprocess.TimeoutExpired:
                         logging.warning(f"LibreOffice command '{cmd}' timed out")
                     except Exception as e:
-                        logging.error(
-                            f"LibreOffice command '{cmd}' failed with exception: {e}"
-                        )
+                        logging.error(f"LibreOffice command '{cmd}' failed with exception: {e}")
 
                 if not conversion_successful:
                     raise RuntimeError(
@@ -177,9 +164,7 @@ class Parser:
                     )
 
                 pdf_path = pdf_files[0]
-                logging.info(
-                    f"Generated PDF: {pdf_path.name} ({pdf_path.stat().st_size} bytes)"
-                )
+                logging.info(f"Generated PDF: {pdf_path.name} ({pdf_path.stat().st_size} bytes)")
 
                 # Validate the generated PDF
                 if pdf_path.stat().st_size < 100:  # Very small file, likely empty
@@ -201,9 +186,7 @@ class Parser:
             raise
 
     @staticmethod
-    def convert_text_to_pdf(
-        text_path: Union[str, Path], output_dir: Optional[str] = None
-    ) -> Path:
+    def convert_text_to_pdf(text_path: Union[str, Path], output_dir: Optional[str] = None) -> Path:
         """
         Convert text file (.txt, .md) to PDF using ReportLab with full markdown support.
 
@@ -230,7 +213,7 @@ class Parser:
                     text_content = f.read()
             except UnicodeDecodeError:
                 # Try with different encodings
-                for encoding in ["gbk", "latin-1", "cp1252"]:
+                for encoding in ["big5", "gbk", "latin-1", "cp1252"]:
                     try:
                         with open(text_path, "r", encoding=encoding) as f:
                             text_content = f.read()
@@ -257,33 +240,110 @@ class Parser:
 
             try:
                 from reportlab.lib.pagesizes import A4
-                from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer
-                from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+                from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
                 from reportlab.lib.units import inch
                 from reportlab.pdfbase import pdfmetrics
                 from reportlab.pdfbase.ttfonts import TTFont
+                from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
 
-                support_chinese = True
-                try:
-                    if "WenQuanYi" not in pdfmetrics.getRegisteredFontNames():
-                        if not Path(
-                            "/usr/share/fonts/wqy-microhei/wqy-microhei.ttc"
-                        ).exists():
-                            support_chinese = False
-                            logging.warning(
-                                "WenQuanYi font not found at /usr/share/fonts/wqy-microhei/wqy-microhei.ttc. Chinese characters may not render correctly."
-                            )
-                        else:
-                            pdfmetrics.registerFont(
-                                TTFont(
-                                    "WenQuanYi",
-                                    "/usr/share/fonts/wqy-microhei/wqy-microhei.ttc",
+                # Detect platform and set font path accordingly
+                import platform
+                import os
+
+                system = platform.system()
+
+                # Define platform-specific font paths
+                # Try multiple possible locations for the font
+                possible_font_paths = []
+
+                if system == "Windows":
+                    # Windows paths
+                    home = Path.home()
+                    possible_font_paths = [
+                        home / ".local" / "share" / "fonts" / "SarasaMonoTC-Regular.ttf",
+                        home
+                        / "AppData"
+                        / "Local"
+                        / "Microsoft"
+                        / "Windows"
+                        / "Fonts"
+                        / "SarasaMonoTC-Regular.ttf",
+                        Path("C:/Windows/Fonts/SarasaMonoTC-Regular.ttf"),
+                    ]
+                    # Also try user-specified path if exists
+                    user_font_path = os.getenv("CHINESE_FONT_PATH")
+                    if user_font_path:
+                        possible_font_paths.insert(0, Path(user_font_path))
+                elif system == "Linux":
+                    # Linux paths
+                    possible_font_paths = [
+                        Path("/home/chad/.local/share/fonts/SarasaMonoTC-Regular.ttf"),
+                        Path.home() / ".local" / "share" / "fonts" / "SarasaMonoTC-Regular.ttf",
+                        Path("/usr/share/fonts/truetype/SarasaMonoTC-Regular.ttf"),
+                        Path("/usr/local/share/fonts/SarasaMonoTC-Regular.ttf"),
+                    ]
+                    user_font_path = os.getenv("CHINESE_FONT_PATH")
+                    if user_font_path:
+                        possible_font_paths.insert(0, Path(user_font_path))
+                elif system == "Darwin":  # macOS
+                    # macOS paths
+                    possible_font_paths = [
+                        Path.home() / "Library" / "Fonts" / "SarasaMonoTC-Regular.ttf",
+                        Path("/Library/Fonts/SarasaMonoTC-Regular.ttf"),
+                        Path("/System/Library/Fonts/SarasaMonoTC-Regular.ttf"),
+                    ]
+                    user_font_path = os.getenv("CHINESE_FONT_PATH")
+                    if user_font_path:
+                        possible_font_paths.insert(0, Path(user_font_path))
+
+                # Find the first existing font path
+                font_path = None
+                for path in possible_font_paths:
+                    try:
+                        resolved_path = (
+                            path.resolve() if path.is_absolute() else path.expanduser().resolve()
+                        )
+                        if resolved_path.exists():
+                            font_path = resolved_path
+                            break
+                    except (OSError, ValueError):
+                        continue
+                font_name = "MesloLGS Nerd Font Mono"
+                support_chinese = False
+                custom_font_registered = False
+
+                # Try to register custom font if path was found
+                if font_path:
+                    try:
+                        if font_name not in pdfmetrics.getRegisteredFontNames():
+                            try:
+                                pdfmetrics.registerFont(
+                                    TTFont(
+                                        font_name,
+                                        str(font_path),
+                                    )
                                 )
-                            )
-                except Exception as e:
-                    support_chinese = False
-                    logging.warning(
-                        f"Failed to register WenQuanYi font: {e}. Chinese characters may not render correctly."
+                                support_chinese = True
+                                custom_font_registered = True
+                                logging.info(
+                                    f"Successfully registered {font_name} from {font_path}"
+                                )
+                            except Exception as register_error:
+                                logging.warning(
+                                    f"Failed to register {font_name} font from {font_path}: {register_error}. Will try system fonts."
+                                )
+                        else:
+                            # Font already registered
+                            support_chinese = True
+                            custom_font_registered = True
+                            logging.debug(f"{font_name} font already registered")
+                    except Exception as e:
+                        logging.warning(
+                            f"Error checking/registering {font_name} font: {e}. Will try system fonts."
+                        )
+                else:
+                    logging.debug(
+                        f"{font_name} font not found in any standard location. Will try system fonts."
                     )
 
                 # Create PDF document
@@ -300,45 +360,99 @@ class Parser:
                 styles = getSampleStyleSheet()
                 normal_style = styles["Normal"]
                 heading_style = styles["Heading1"]
-                if support_chinese:
-                    normal_style.fontName = "WenQuanYi"
-                    heading_style.fontName = "WenQuanYi"
 
-                # Try to register a font that supports Chinese characters
-                try:
-                    # Try to use system fonts that support Chinese
-                    import platform
+                # Set font name if custom font was registered
+                if custom_font_registered:
+                    normal_style.fontName = font_name
+                    heading_style.fontName = font_name
+                else:
+                    # Try to register system fonts that support Chinese characters
+                    try:
+                        if system == "Windows":
+                            # Try common Windows fonts
+                            for sys_font_name in [
+                                "SimSun",
+                                "SimHei",
+                                "Microsoft YaHei",
+                                "ZhunYuan",
+                                "Sarasa Mono TC",
+                                "微軟正黑體",
+                                "Segoe UI",
+                            ]:
+                                try:
+                                    from reportlab.pdfbase.cidfonts import (
+                                        UnicodeCIDFont,
+                                    )
 
-                    system = platform.system()
-                    if system == "Windows":
-                        # Try common Windows fonts
-                        for font_name in ["SimSun", "SimHei", "Microsoft YaHei"]:
-                            try:
-                                from reportlab.pdfbase.cidfonts import (
-                                    UnicodeCIDFont,
-                                )
+                                    pdfmetrics.registerFont(UnicodeCIDFont(sys_font_name))
+                                    normal_style.fontName = sys_font_name
+                                    heading_style.fontName = sys_font_name
+                                    support_chinese = True
+                                    logging.info(f"Using system font: {sys_font_name}")
+                                    break
+                                except Exception as e:
+                                    logging.debug(
+                                        f"Failed to register Windows font {sys_font_name}: {e}"
+                                    )
+                                    continue
+                        elif system == "Darwin":  # macOS
+                            for sys_font_name in [
+                                "STSong-Light",
+                                "STHeiti",
+                                "PingFang SC",
+                                "Hiragino Sans GB",
+                            ]:
+                                try:
+                                    from reportlab.pdfbase.cidfonts import (
+                                        UnicodeCIDFont,
+                                    )
 
-                                pdfmetrics.registerFont(UnicodeCIDFont(font_name))
-                                normal_style.fontName = font_name
-                                heading_style.fontName = font_name
-                                break
-                            except Exception:
-                                continue
-                    elif system == "Darwin":  # macOS
-                        for font_name in ["STSong-Light", "STHeiti"]:
-                            try:
-                                from reportlab.pdfbase.cidfonts import (
-                                    UnicodeCIDFont,
-                                )
+                                    pdfmetrics.registerFont(UnicodeCIDFont(sys_font_name))
+                                    normal_style.fontName = sys_font_name
+                                    heading_style.fontName = sys_font_name
+                                    support_chinese = True
+                                    logging.info(f"Using system font: {sys_font_name}")
+                                    break
+                                except Exception as e:
+                                    logging.debug(
+                                        f"Failed to register macOS font {sys_font_name}: {e}"
+                                    )
+                                    continue
+                        else:  # Linux and other systems
+                            # Try common Linux fonts
+                            for sys_font_name in [
+                                "WenQuanYi Micro Hei",
+                                "Noto Sans CJK SC",
+                                "Source Han Sans CN",
+                                "Ubuntu",
+                                "UbuntuMono",
+                                "DejaVuSans",
+                            ]:
+                                try:
+                                    from reportlab.pdfbase.cidfonts import (
+                                        UnicodeCIDFont,
+                                    )
 
-                                pdfmetrics.registerFont(UnicodeCIDFont(font_name))
-                                normal_style.fontName = font_name
-                                heading_style.fontName = font_name
-                                break
-                            except Exception:
-                                continue
-                except Exception:
-                    pass  # Use default fonts if Chinese font setup fails
+                                    pdfmetrics.registerFont(UnicodeCIDFont(sys_font_name))
+                                    normal_style.fontName = sys_font_name
+                                    heading_style.fontName = sys_font_name
+                                    support_chinese = True
+                                    logging.info(f"Using system font: {sys_font_name}")
+                                    break
+                                except Exception as e:
+                                    logging.debug(
+                                        f"Failed to register Linux font {sys_font_name}: {e}"
+                                    )
+                                    continue
+                    except Exception as e:
+                        logging.warning(f"Failed to register system Chinese fonts: {e}")
+                        # Use default fonts if Chinese font setup fails
+
+                # Final check: warn if no Chinese font support
+                if not support_chinese:
+                    logging.warning(
+                        "No Chinese font support available. Chinese characters may not render correctly in PDF."
+                    )
 
                 # Build content
                 story = []
@@ -392,9 +506,7 @@ class Parser:
                         # Regular text lines
                         # Escape special characters for ReportLab
                         safe_line = (
-                            line.replace("&", "&amp;")
-                            .replace("<", "&lt;")
-                            .replace(">", "&gt;")
+                            line.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
                         )
 
                         # Create paragraph
@@ -419,9 +531,7 @@ class Parser:
                     "Please install it using: pip install reportlab"
                 )
             except Exception as e:
-                raise RuntimeError(
-                    f"Failed to convert text file {text_path.name} to PDF: {str(e)}"
-                )
+                raise RuntimeError(f"Failed to convert text file {text_path.name} to PDF: {str(e)}")
 
             # Validate the generated PDF
             if not pdf_path.exists() or pdf_path.stat().st_size < 100:
@@ -560,9 +670,7 @@ class Parser:
         Returns:
             bool: True if installation is valid, False otherwise
         """
-        raise NotImplementedError(
-            "check_installation must be implemented by subclasses"
-        )
+        raise NotImplementedError("check_installation must be implemented by subclasses")
 
 
 class MineruParser(Parser):
@@ -652,7 +760,7 @@ class MineruParser(Parser):
             # Prepare subprocess parameters to hide console window on Windows
             import platform
             import threading
-            from queue import Queue, Empty
+            from queue import Empty, Queue
 
             # Log the command being executed
             logging.info(f"Executing mineru command: {' '.join(cmd)}")
@@ -840,9 +948,7 @@ class MineruParser(Parser):
                         ]:
                             if field_name in item and item[field_name]:
                                 img_path = item[field_name]
-                                absolute_img_path = (
-                                    images_base_dir / img_path
-                                ).resolve()
+                                absolute_img_path = (images_base_dir / img_path).resolve()
                                 item[field_name] = str(absolute_img_path)
                                 logging.debug(
                                     f"Updated {field_name}: {img_path} -> {item[field_name]}"
@@ -970,9 +1076,7 @@ class MineruParser(Parser):
 
             # If format is not natively supported by MinerU, convert it
             if ext not in mineru_supported_formats:
-                logging.info(
-                    f"Converting {ext} image to PNG for MinerU compatibility..."
-                )
+                logging.info(f"Converting {ext} image to PNG for MinerU compatibility...")
 
                 try:
                     from PIL import Image
@@ -1019,9 +1123,7 @@ class MineruParser(Parser):
                 except Exception as e:
                     if temp_converted_file and temp_converted_file.exists():
                         temp_converted_file.unlink()
-                    raise RuntimeError(
-                        f"Failed to convert image {image_path.name}: {str(e)}"
-                    )
+                    raise RuntimeError(f"Failed to convert image {image_path.name}: {str(e)}")
 
             name_without_suff = image_path.stem
 
@@ -1094,9 +1196,7 @@ class MineruParser(Parser):
             pdf_path = self.convert_office_to_pdf(doc_path, output_dir)
 
             # Parse the converted PDF
-            return self.parse_pdf(
-                pdf_path=pdf_path, output_dir=output_dir, lang=lang, **kwargs
-            )
+            return self.parse_pdf(pdf_path=pdf_path, output_dir=output_dir, lang=lang, **kwargs)
 
         except Exception as e:
             logging.error(f"Error in parse_office_doc: {str(e)}")
@@ -1128,9 +1228,7 @@ class MineruParser(Parser):
             pdf_path = self.convert_text_to_pdf(text_path, output_dir)
 
             # Parse the converted PDF
-            return self.parse_pdf(
-                pdf_path=pdf_path, output_dir=output_dir, lang=lang, **kwargs
-            )
+            return self.parse_pdf(pdf_path=pdf_path, output_dir=output_dir, lang=lang, **kwargs)
 
         except Exception as e:
             logging.error(f"Error in parse_text_file: {str(e)}")
@@ -1181,8 +1279,7 @@ class MineruParser(Parser):
         else:
             # For unsupported file types, try as PDF
             logging.warning(
-                f"Warning: Unsupported file extension '{ext}', "
-                f"attempting to parse as PDF"
+                f"Warning: Unsupported file extension '{ext}', attempting to parse as PDF"
             )
             return self.parse_pdf(file_path, output_dir, method, lang, **kwargs)
 
@@ -1281,9 +1378,7 @@ class DoclingParser(Parser):
             )
 
             # Read the generated output files
-            content_list, _ = self._read_output_files(
-                base_output_dir, name_without_suff
-            )
+            content_list, _ = self._read_output_files(base_output_dir, name_without_suff)
             return content_list
 
         except Exception as e:
@@ -1467,9 +1562,7 @@ class DoclingParser(Parser):
         else:
             if type not in ["groups", "body"]:
                 cnt += 1
-                content_list.append(
-                    self.read_from_block(block, type, output_dir, cnt, num)
-                )
+                content_list.append(self.read_from_block(block, type, output_dir, cnt, num))
             members = block["children"]
             for member in members:
                 cnt += 1
@@ -1598,9 +1691,7 @@ class DoclingParser(Parser):
             )
 
             # Read the generated output files
-            content_list, _ = self._read_output_files(
-                base_output_dir, name_without_suff
-            )
+            content_list, _ = self._read_output_files(base_output_dir, name_without_suff)
             return content_list
 
         except Exception as e:
@@ -1656,9 +1747,7 @@ class DoclingParser(Parser):
             )
 
             # Read the generated output files
-            content_list, _ = self._read_output_files(
-                base_output_dir, name_without_suff
-            )
+            content_list, _ = self._read_output_files(base_output_dir, name_without_suff)
             return content_list
 
         except Exception as e:
@@ -1693,8 +1782,7 @@ class DoclingParser(Parser):
             return True
         except (subprocess.CalledProcessError, FileNotFoundError):
             logging.debug(
-                "Docling is not properly installed. "
-                "Please ensure it is installed correctly."
+                "Docling is not properly installed. Please ensure it is installed correctly."
             )
             return False
 
@@ -1703,9 +1791,7 @@ def main():
     """
     Main function to run the document parser from command line
     """
-    parser = argparse.ArgumentParser(
-        description="Parse documents using MinerU 2.0 or Docling"
-    )
+    parser = argparse.ArgumentParser(description="Parse documents using MinerU 2.0 or Docling")
     parser.add_argument("file_path", help="Path to the document to parse")
     parser.add_argument("--output", "-o", help="Output directory path")
     parser.add_argument(
@@ -1753,9 +1839,7 @@ def main():
         action="store_true",
         help="Disable table parsing",
     )
-    parser.add_argument(
-        "--stats", action="store_true", help="Display content statistics"
-    )
+    parser.add_argument("--stats", action="store_true", help="Display content statistics")
     parser.add_argument(
         "--check",
         action="store_true",

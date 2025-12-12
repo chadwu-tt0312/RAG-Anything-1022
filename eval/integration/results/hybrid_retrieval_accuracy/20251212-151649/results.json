@@ -1,0 +1,272 @@
+{
+  "meta": {
+    "docs": [
+      "D:\\_Code\\_GitHub\\RAG-Anything-1022\\eval\\docs\\test-01.txt"
+    ],
+    "query_set": "D:\\_Code\\_GitHub\\RAG-Anything-1022\\eval\\integration\\hybrid_eval_queries.jsonl",
+    "modes": [
+      "naive",
+      "local",
+      "global",
+      "hybrid"
+    ],
+    "working_dir": "D:\\_Code\\_GitHub\\RAG-Anything-1022\\eval\\integration\\rag_storage_hybrid_eval",
+    "llm_model": "gpt-4o-mini",
+    "embedding_model": "text-embedding-3-small",
+    "embedding_dim": 1536,
+    "timestamp": "2025-12-12T15:16:56",
+    "vlm_enhanced": false
+  },
+  "cases": [
+    {
+      "id": "q01",
+      "query": "Transformer 最初是在哪一年、由哪篇論文提出？",
+      "ground_truth": "Transformer 最初由 Vaswani 等人在 2017 年的論文《Attention Is All You Need》中提出。",
+      "query_type": "fact",
+      "expected_best_mode": "naive",
+      "by_mode": {
+        "naive": {
+          "answer": "Transformer 最初是在 2017 年由 Vaswani 等人提出的，該論文的標題為《Attention Is All You Need》。這篇論文介紹了這種基於深度學習的神經網路架構，並展示了其在自然語言處理任務中的強大能力。\n\n### References\n\n- [1] test-01.txt",
+          "elapsed_s": 2.714670000001206,
+          "score": 0.8435707275316241
+        },
+        "local": {
+          "answer": "Transformer 最初是在 2017 年由 Vaswani 等人在論文《Attention Is All You Need》中提出的。這篇論文介紹了 Transformer 模型的核心概念以及其在自然語言處理領域的應用。\n\n### References\n\n- [1] test-01.txt",
+          "elapsed_s": 5.073836200001097,
+          "score": 0.8194589063729766
+        },
+        "global": {
+          "answer": "Transformer 最初是由 Vaswani 等人在 2017 年的論文《Attention Is All You Need》中提出的。這篇論文引入了全新的深度學習架構，並以其強大的序列建模能力著稱，特別是在自然語言處理（NLP）任務中取得了突破性的成就。\n\n### References\n\n- [1] test-01.txt",
+          "elapsed_s": 5.290775199999189,
+          "score": 0.8176040832870669
+        },
+        "hybrid": {
+          "answer": "Transformer 最初是在 2017 年提出的，根據論文《Attention Is All You Need》。這篇論文是由 Vaswani 等人共同撰寫的，其中首次介紹了 Transformer 模型的架構與特點。\n\n### References\n\n- [1] test-01.txt",
+          "elapsed_s": 6.3035853000001225,
+          "score": 0.8286879434955543
+        }
+      }
+    },
+    {
+      "id": "q02",
+      "query": "Transformer 相對於 RNN（例如 LSTM/GRU）主要改善了哪些問題？",
+      "ground_truth": "相較 RNN 的序列化計算與長序列下的梯度問題，Transformer 透過 self-attention 支援高度並行計算並更有效建模長距離依賴，降低效率瓶頸與長距依賴困難。",
+      "query_type": "explain",
+      "expected_best_mode": "hybrid",
+      "by_mode": {
+        "naive": {
+          "answer": "Transformer 相對於 RNN（如 LSTM 和 GRU）在以下幾個方面有顯著改善：\n\n1. **計算效率**：RNN 是序列化的，這意味著它們無法同時處理整個輸入序列，而是需要逐步處理，這影響了計算效率。相對而言，Transformer 能夠利用自注意力機制，同時對整個序列進行計算，大大提升了訓練效率。\n\n2. **長距離依賴建模能力**：RNN 在處理長距離依賴時容易受到梯度消失或梯度爆炸的影響。Transformer 的自注意力機制允許模型直接計算序列中任意兩個位置的相互關係，因此它在建模長距離依賴方面表現更佳。\n\n3. **並行計算能力**：由於自注意力機制的特性，Transformer 能夠有效利用並行計算，這使得訓練過程中可加速計算，適應更大規模的數據集。\n\n4. **靈活性與可擴展性**：Transformer 的架構使其能夠靈活應對各種下游任務，並更容易擴展到更深的模型架構，而這在 RNN 中通常難以實現。\n\n總結來說，Transformer 透過引入自注意力機制，不僅克服了 RNN 的一些根本性限制，還在無需大幅度改變網路結構的情況下，提升了模型的整體性能與計算效率。\n\n### References\n\n- [1] test-01.txt",
+          "elapsed_s": 8.011067199997342,
+          "score": 0.7276097109775634
+        },
+        "local": {
+          "answer": "Transformer 相對於 RNN（如 LSTM 和 GRU）在多個方面顯著改善了以下問題：\n\n1. **長距離依賴建模**：\n   - RNNs 在處理長序列時常面臨梯度消失和梯度爆炸問題，這會限制其捕捉長距離依賴的能力。相反，Transformer 使用自注意力機制（Self-Attention Mechanism）允許模型直接建模序列中任意兩個位置之間的關係，從而有效地解決了長距離依賴的問題。\n\n2. **並行計算能力**：\n   - RNN 的結構是序列性的，無法同時處理整個輸入序列，這導致計算效率較低。Transformer 在設計上允許並行計算，使其能夠同時處理整個序列，大大提高了訓練效率。\n\n3. **計算成本**：\n   - 雖然 CNN 可以用於處理序列數據，但在建模長距離依賴時需要多層卷積，從而增加了計算成本。Transformer 的設計使其在處理長距離依賴時更為高效。\n\n4. **模塊化結構**：\n   - Transformer 的架構由編碼器（Encoder）和解碼器（Decoder）組成，這些部分可以靈活堆疊多層，適應不同類型的任務，使其在各種應用中都表現優異。\n\n總的來說，Transformer 的核心創新在於自注意力機制和並行計算能力，使其超越了 RNN 在處理序列數據上的各種限制。\n\n### References\n\n- [1] test-01.txt",
+          "elapsed_s": 12.161267399998906,
+          "score": 0.728603230926411
+        },
+        "global": {
+          "answer": "Transformer 相對於 RNN（例如 LSTM 和 GRU）主要改善了以下幾個問題：\n\n1. **計算效率**：\n   - RNN 的結構本質上是序列化的，造成它無法同時處理所有輸入數據，影響計算效率。而 Transformer 模型引入了全新的注意力機制，使其能夠更高效地處理長距離的依賴問題，並且支持大規模的並行計算。\n\n2. **長距離依賴建模**：\n   - RNN 在處理長序列時常常會遭遇梯度消失和梯度爆炸問題，這使得它難以捕捉序列中的長距依賴關係。相比之下，Transformer 的自注意力機制使得模型能夠直接建模序列中任意兩個位置之間的關係，從而有效地解決了這一問題。\n\n3. **架構靈活性與可擴展性**：\n   - Transformer 模型由編碼器和解碼器組成，兩者都可以堆疊多層，這樣的設計使得模型在面對各種下游任務時更加靈活且易於擴展，而 RNN 的設計通常比較固定。\n\n4. **訓練穩定性**：\n   - 相較於 RNN，Transformer 的訓練過程通常更為穩定。因為自注意力機制和前饋神經網路結合了殘差連接和層歸一化，可以進一步穩定訓練過程，增強模型的表現力。\n\n這些改進使得 Transformer 成為處理序列數據的更佳選擇，尤其是在自然語言處理等領域中取得了突破性的成就。\n\n### References\n\n- [1] test-01.txt",
+          "elapsed_s": 12.039812499999243,
+          "score": 0.7198500770861977
+        },
+        "hybrid": {
+          "answer": "Transformer 相對於 RNN（如 LSTM 和 GRU）在處理序列數據方面主要改善了以下幾個問題：\n\n1. **計算效率**：\n   - RNN 的結構是序列化的，無法同時處理整個輸入序列，這導致計算效率較低。相比之下，Transformer 的自注意力機制使其能夠同時處理整個序列，極大提高了訓練效率。\n\n2. **長距離依賴問題**：\n   - RNN 在捕捉長距離依賴關係時可能會面臨梯度消失或梯度爆炸的問題，這限制了其模型性能。Transformer 的自注意力機制能夠直接建模序列中任意兩個位置之間的關係，有效地解決了長距依賴的建模問題。\n\n3. **並行計算能力**：\n   - 由於 RNN 的計算是逐步進行的，因此無法利用現代計算機的高度並行處理能力。而 Transformer 允許使用並行計算，進一步加快了模型的訓練速度。\n\n4. **架構靈活性**：\n   - Transformer 的結構包含編碼器和解碼器，可以根據不同的任務進行靈活的堆疊和調整，而 RNN 的結構則較為固定，適應性不如 Transformer。\n\n總結來說，Transformer 透過這些核心特點，提升了處理序列數據的能力，並突破了 RNN 在資訊捕捉和計算效率上的限制。\n\n### References\n\n- [1] test-01.txt",
+          "elapsed_s": 11.705778100000316,
+          "score": 0.7261549351288779
+        }
+      }
+    },
+    {
+      "id": "q03",
+      "query": "為什麼 Transformer 需要 Positional Encoding？常見做法是什麼？",
+      "ground_truth": "因 Transformer 不像 RNN 具備天然的順序處理特性，需要用 Positional Encoding 提供序列位置資訊；常見做法是使用正弦/餘弦函數生成位置編碼。",
+      "query_type": "explain",
+      "expected_best_mode": "local",
+      "by_mode": {
+        "naive": {
+          "answer": "在 Transformer 模型中，Positional Encoding 的引入是為了彌補模型缺乏序列順序處理能力的不足。與 RNN 相比，Transformer 不具備自然的序列處理特性，因此無法直接獲取詞語在序列中的位置信息。這一點對於理解上下文至關重要。\n\n### Positional Encoding 的必要性\n- **序列順序捕捉**：Positional Encoding 使模型能夠將位置信息納入計算，幫助其理解序列中元素的相對或絕對位置，從而捕捉到序列中位置的依賴關係。\n- **優化訓練**：只有具備位置信息的輸入，模型才能夠更有效地學習序列的結構和特點，從而提升其表現。\n\n### 常見做法\n在 Transformer 中，常見的 Positional Encoding 方法是使用正弦和余弦函數生成位置編碼。具體方法如下：\n- **正弦和余弦函數**：對於每一個位置 \\( pos \\) 和維度 \\( i \\)，使用以下公式來計算：\n  - $$ PE(pos, 2i) = sin\\left(\\frac{pos}{10000^{\\frac{2i}{d_{model}}}}\\right) $$\n  - $$ PE(pos, 2i+1) = cos\\left(\\frac{pos}{10000^{\\frac{2i}{d_{model}}}}\\right) $$\n- 這樣的設計使得不同維度的 Positional Encoding 可以產生平滑且可區分的位置信息，使模型能夠有效的理解輸入序列中各個位置。\n\n總之，Positional Encoding 在 Transformer 架構中是不可或缺的，它幫助模型理解序列的結構，並提高了自然語言處理任務的效率和效果。\n\n### References\n\n- [1] test-01.txt",
+          "elapsed_s": 9.322832600002585,
+          "score": 0.7524788696510628
+        },
+        "local": {
+          "answer": "在 Transformer 模型中，**Positional Encoding** 是一個重要的組件，因為它提供了序列中各個位置的位置信息。由於 Transformer 自身不具備像 RNN（遞歸神經網路）那樣的序列化處理特性，因此無法直接捕捉到數據的順序。Positional Encoding 使模型能夠理解每個元素在序列中的相對位置和順序。\n\n### 常見做法\n\nPositional Encoding 通常使用正弦和餘弦函數來生成，這樣可以為不同的維度提供獨特的位置信息，使得模型能夠有效地學習到位置之間的相對關係。在具體實現上，對於序列中的每個位置 \\( pos \\) 和維度 \\( i \\)，Positional Encoding 是這樣計算的：\n\n- 對於 奇數維度 \\( i \\): \n  \\[\n  PE(pos, 2i) = sin\\left(\\frac{pos}{10000^{\\frac{2i}{d_{model}}}}\\right)\n  \\]\n  \n- 對於 偶數維度 \\( i \\):\n  \\[\n  PE(pos, 2i + 1) = cos\\left(\\frac{pos}{10000^{\\frac{2i}{d_{model}}}}\\right)\n  \\]\n\n這些編碼向量會在輸入嵌入層中添加到輸入向量上，從而使 Transformer 在處理序列時能夠考慮到每個單詞的位置信息。\n\n### 總結\n\n通過使用 Positional Encoding，Transformer 能夠有效地捕捉序列中的長距依賴關係，提高模型的性能和準確性，特別是在自然語言處理任務中。\n\n### References\n\n- [1] test-01.txt",
+          "elapsed_s": 14.080783800000063,
+          "score": 0.7220181457728545
+        },
+        "global": {
+          "answer": "在 Transformer 模型中，**Positional Encoding**（位置編碼）是必要的，因為這種架構與傳統的循環神經網絡（RNN）不同，並不具備內建的序列順序處理特性。由於 Transformer 能夠同時處理整個輸入序列，這意味著模型在計算時不會知道各個單詞的位置，因此需要賦予模型位置信息。\n\n### Positional Encoding 的用途\n\n- **提供位置信息**：通過將位置編碼添加到輸入嵌入（embedding）中，模型可以獲得每個單詞的相對或絕對位置信息，從而理解序列中的順序關係。\n- **解決長距依賴問題**：位置編碼能夠幫助模型更好地捕捉長距離依賴性，因為自注意力機制可以直接訪問整個序列的每個位置。\n\n### 常見做法\n\n常見的 Positional Encoding 實現方式通常會使用正弦和餘弦函數。這種做法的特點包括：\n\n- **正弦和餘弦函數**：對於每個位置 \\( pos \\) 和每個維度 \\( i \\)，位置編碼使用以下兩個公式生成：\n  - \\( PE(pos, 2i) = \\sin(pos / 10000^{2i/d_{model}}) \\)\n  - \\( PE(pos, 2i + 1) = \\cos(pos / 10000^{2i/d_{model}}) \\)\n  \n這裡，\\( d_{model} \\) 是嵌入的維度，\\( pos \\) 是單詞在序列中的位置。這種方式不僅有效地捕捉了序列的位置信息，還能保證不同位置之間的關聯性通過距離進行區分。\n\n這種使用正弦和餘弦函數的計算方式使得位置編碼可以有效地融入到輸入序列中，從而提升 Transformer 構架的表現。\n\n### 結論\n\n總而言之，Positional Encoding 是 Transformer 模型中不可或缺的組成部分，使得模型能夠理解輸入序列中的位置信息，這對於處理語言和其他序列數據至關重要。",
+          "elapsed_s": 17.48158080000212,
+          "score": 0.7595351353835715
+        },
+        "hybrid": {
+          "answer": "在 Transformer 模型中，**Positional Encoding** 是一個關鍵的組件，因為它為序列中的每個位置提供了位置信息。由於 Transformer 本身沒有像 RNN 那樣的順序處理能力，Positional Encoding 用來克服這一限制，幫助模型理解序列中各個位置之間的相對關係。\n\n### 為什麼需要 Positional Encoding？\n\n1. **缺乏順序性**：Transformer 的架構允許並行處理序列中的所有元素，但這也意味著模型無法自動識別元素的順序。Positional Encoding 為此提供了解決方案。\n2. **捕捉長距離依賴**：通過引入位置信息，模型能夠更好地捕捉序列中的長距離依賴關係，這對於有效的語言理解和生成至關重要。\n\n### 常見做法\n\nPositional Encoding 的常見做法是使用正弦和餘弦函數來生成位置編碼。這些函數可以根據位置生成一組獨特的向量，通常使用以下公式來計算：\n\n- 對於每個位置 \\( pos \\) 和維度 \\( i \\) 的位置編碼計算為：\n\n  - \\( PE(pos, 2i) = \\sin(pos / 10000^{2i/d_{model}}) \\)\n  - \\( PE(pos, 2i+1) = \\cos(pos / 10000^{2i/d_{model}}) \\)\n\n這種方法確保了不同位置的編碼在一定程度上是獨特的，並且具有平滑的相似性，使得模型可以理解，距離較近的向量在某種程度上也會更相似。\n\n### 小結\n\n總之，Positional Encoding 在 Transformer 的運作中起著至關重要的作用，幫助模型捕捉序列中各位置之間的關係，從而提高了模型在自然語言處理任務中的表現。\n\n### References\n\n- [1] test-01.txt",
+          "elapsed_s": 19.146771199997602,
+          "score": 0.7417332407922865
+        }
+      }
+    },
+    {
+      "id": "q04",
+      "query": "Transformer 的兩個主要部分是什麼？它們各自的作用是什麼？",
+      "ground_truth": "Transformer 由 Encoder 與 Decoder 組成。Encoder 將輸入序列轉換為上下文豐富表示；Decoder 依據 Encoder 輸出生成輸出序列，並包含 masked attention 等設計。",
+      "query_type": "summary",
+      "expected_best_mode": "hybrid",
+      "by_mode": {
+        "naive": {
+          "answer": "Transformer 的兩個主要部分是 **編碼器**（Encoder）和 **解碼器**（Decoder）。以下是它們各自的作用：\n\n### 編碼器（Encoder）\n- **功能**：編碼器的主要作用是將輸入序列轉換為一組上下文豐富的特徵表示。\n- **結構**：編碼器由多個核心部分組成，包括：\n  - **嵌入層**（Embedding Layer）：將輸入的離散符號（如詞語或字符）轉換為連續的向量表示。\n  - **位置編碼**（Positional Encoding）：由於 Transformer 不具備像 RNN 那樣的順序處理特性，引入位置編碼提供序列中各位置的位置信息。\n  - **自注意力機制**（Self-Attention Mechanism）：通過計算每個輸入位置與序列中所有其他位置的相似度來獲得加權的輸入表示。\n  - **前饋神經網路**（Feed-Forward Network）和**殘差連接與層歸一化**（Residual Connection and Layer Normalization）：這些部件有助於穩定訓練過程，增強模型的表現力。\n\n### 解碼器（Decoder）\n- **功能**：解碼器的作用是基於編碼器輸出的特徵表示，生成輸出序列。\n- **結構**：解碼器的結構與編碼器相似，但加入了一些特定的設計，例如：\n  - **遮罩機制**（Masked Attention）：保證解碼時只能訪問當前時間步之前的輸出，以維持因果性。\n  - **多頭注意力**（Multi-Head Attention）：這部分分為自注意力和用於整合來自編碼器輸出的跨注意力層。\n\n這樣的設計使得 Transformer 模型能夠有效地處理序列數據並生成高質量的輸出。 \n\n### References\n- [1] test-01.txt",
+          "elapsed_s": 11.764411800002563,
+          "score": 0.7166582463566562
+        },
+        "local": {
+          "answer": "Transformer 模型的兩個主要部分是 **編碼器（Encoder）** 和 **解碼器（Decoder）**。\n\n### 編碼器（Encoder）\n編碼器的主要作用是將輸入序列轉換為上下文豐富的特徵表示。其結構包括以下幾個核心部分：\n- **嵌入層（Embedding Layer）**：將輸入的離散符號（如詞語或字符）轉換為連續的向量表示。\n- **位置編碼（Positional Encoding）**：因為 Transformer 不具備像 RNN 那樣的順序處理特性，所以需要給予各位置的位置信息，通常使用正弦和餘弦函數生成。\n- **自注意力機制（Self-Attention Mechanism）**：核心功能，能夠計算序列中各位置之間的關係，從而獲得加權的輸入表示。\n- **前馈神经网络（Feed-Forward Network, FFN）**：進一步處理特徵，增強模型表現力。\n\n### 解碼器（Decoder）\n解碼器的作用是根據編碼器生成的特徵表示，生成輸出序列。其結構與編碼器類似，但包含一些特定的設計：\n- **遮罩機制（Masked Attention）**：保證解碼時只能訪問當前時間步之前的輸出，以保持因果性。\n- **多頭注意力（Multi-Head Attention）**：允許模型同時關注不同的子空間特徵，以增強生成的文本品質。\n\n這兩個主要部分共同協作，使得 Transformer 能夠有效地處理和生成序列數據，並實現各種 NLP 任務。\n\n### References\n- [1] test-01.txt",
+          "elapsed_s": 14.003072700001212,
+          "score": 0.7151530101675815
+        },
+        "global": {
+          "answer": "Transformer 的兩個主要部分是 **編碼器（Encoder）** 和 **解碼器（Decoder）**。\n\n### 1. 編碼器（Encoder）\n編碼器的主要作用是將輸入序列轉換為一組上下文豐富的特徵表示。它的結構由幾個核心部分組成：\n- **嵌入層（Embedding Layer）**：將輸入的離散符號（如詞語或字符）轉換為連續的向量表示。\n- **位置編碼（Positional Encoding）**：由於 Transformer 不具備像 RNN 那樣的順序處理特性，因此引入位置編碼來提供序列中各位置的位置信息。\n- **自注意力機制（Self-Attention Mechanism）**：這是 Transformer 的核心，能夠計算序列中任意兩個位置之間的相似度，生成加權的輸入表示。\n- **前饋神經網路（Feed-Forward Network, FFN）**：進一步增強模型的表現力與穩定性。\n\n### 2. 解碼器（Decoder）\n解碼器的作用是基於編碼器輸出的特徵表示生成輸出序列。解碼器的架構類似於編碼器，但包含了以下特定設計：\n- **遮罩機制（Masked Attention）**：確保解碼時只能訪問當前時間步之前的輸出，以維持因果性。\n- **多頭注意力（Multi-Head Attention）**：將自注意力和整合來自編碼器輸出的跨注意力層，強化模型生成的能力。\n\n這兩個組件的結合使 Transformer 能夠進行高效的序列建模，並在多種自然語言處理（NLP）任務中表現出色。\n\n### References\n- [1] test-01.txt",
+          "elapsed_s": 13.777142700000695,
+          "score": 0.7250681605269077
+        },
+        "hybrid": {
+          "answer": "Transformer 的兩個主要部分是 **編碼器（Encoder）** 和 **解碼器（Decoder）**。\n\n### 編碼器（Encoder）\n編碼器的主要作用是將輸入序列轉換為一組上下文豐富的特徵表示。其結構包含幾個核心部分：\n- **嵌入層（Embedding Layer）**：將輸入的離散符號（如詞語或字符）轉換為連續的向量表示。\n- **位置編碼（Positional Encoding）**：由於 Transformer 不具備 RNN 的順序處理特性，位置編碼提供序列中各位置的位置信息，通常使用正弦和餘弦函數生成。\n- **自注意力機制（Self-Attention Mechanism）**：計算每個輸入位置與序列中所有其他位置的相似度，以獲得加權的輸入表示。\n- **前饋神經網路（Feed-Forward Network, FFN）**：進一步處理特徵，穩定訓練過程。\n\n### 解碼器（Decoder）\n解碼器則是基於編碼器的輸出特徵生成輸出序列。其結構與編碼器類似，但添加了特定設計：\n- **遮罩機制（Masked Attention）**：保證解碼時只能訪問當前時間步之前的輸出，以維持因果性。\n- **多頭注意力（Multi-Head Attention）**：分為自注意力和跨注意力層，整合編碼器輸出的信息。\n\n總體而言，編碼器專注於將輸入數據轉換為有用的特徵，而解碼器則利用這些特徵生成最終的輸出序列。\n\n### References\n- [1] test-01.txt",
+          "elapsed_s": 16.403985199998715,
+          "score": 0.7273711990385144
+        }
+      }
+    },
+    {
+      "id": "q05",
+      "query": "Self-Attention 的 Q/K/V 各代表什麼？概念上怎麼用來計算注意力？",
+      "ground_truth": "Self-attention 對每個位置經線性變換得到 Query/Key/Value。以 Query 與各 Key 的內積得到注意力分數，經 softmax 成為權重，再對 Value 加權求和得到該位置的輸出表示。",
+      "query_type": "explain",
+      "expected_best_mode": "hybrid",
+      "by_mode": {
+        "naive": {
+          "answer": "在 Self-Attention 機制中，Q、K 和 V 分別代表查詢向量（Query）、鍵向量（Key）和值向量（Value）。這些向量的生成過程如下：\n\n1. **查詢向量（Q）**：每個輸入位置通過線性變換生成的查詢向量，用於表示該位置希望從其他位置獲取的信息。\n\n2. **鍵向量（K）**：每個輸入位置同樣經過線性變換生成的鍵向量，用來標識其包含的信息。\n\n3. **值向量（V）**：每個位置的值向量也是通過線性變換生成，代表該位置實際提供的信息。\n\n計算注意力的過程是通過如下步驟進行的：\n\n- 首先，模型計算查詢向量Q與所有鍵向量K的相似性，通常通過內積運算來完成，這會生成一組注意力分數。\n- 接著，這些注意力分數經過 softmax 函數進行歸一化，以獲得權重，這些權重表示各個位置對當前查詢位置的重要性。\n- 最後，根據這些權重對所有值向量V進行加權平均，便得到該查詢位置的最終輸出表示。\n\n這一過程允許模型根據不同輸入位置的相對重要性來自適應地聚焦於信息，使得在長距離依賴建模中表現得以大幅提升。\n\n### References\n\n- [1] test-01.txt",
+          "elapsed_s": 13.568202599999495,
+          "score": 0.715376453917021
+        },
+        "local": {
+          "answer": "在自注意力機制中，Q、K、V 分別代表查詢向量（Query）、鍵向量（Key）和值向量（Value）。這三個向量的概念如下：\n\n1. **查詢向量（Q）**：用於表示當前位置想要關注的內容。\n2. **鍵向量（K）**：用於表示序列中每個位置的信息，它與查詢向量進行比對以計算相似度。\n3. **值向量（V）**：在計算完注意力後，實際上用來生成輸出的一組向量。\n\n### 注意力計算步驟\n\n自注意力的計算過程如下：\n\n1. **生成 Q、K、V 向量**：對於輸入序列中的每個位置，通過線性變換生成查詢向量 Q、鍵向量 K 和值向量 V。\n  \n2. **計算相似性**：計算查詢向量 Q 與所有鍵向量 K 的相似性。這通過進行內積來實現，得到注意力分數。\n\n3. **權重計算**：將注意力分數經過 softmax 函數處理，將其轉換為權重，這些權重表示了每個位置在當前查詢位置的重要性。\n\n4. **生成輸出**：根據計算得出的權重，對所有值向量 V 進行加權求和，生成輸出向量。\n\n### 概念上如何應用\n\n自注意力機制使模型能夠靈活地捕捉序列中不同位置之間的關係，能夠專注於與當前位置最相關的信息，這對於處理長距離依賴具有重要意義。自注意力的計算過程保證了能夠有效建模任意兩個位置之間的關係，進一步提升了模型的表現力。\n\n這一過程是 Transformer 模型中不可或缺的部分，特別是在自然語言處理任務中，它提高了處理文本資料的效率和準確性。\n\n### References\n\n- [1] test-01.txt",
+          "elapsed_s": 17.86979810000048,
+          "score": 0.6515983994326933
+        },
+        "global": {
+          "answer": "在自注意力機制（Self-Attention）中，Q、K 和 V 分別代表查詢（Query）、鍵（Key）和值（Value）向量。這些向量的計算過程和其功能如下：\n\n### 各向量的定義\n- **查詢（Q）**：表示當前要關注的特定位置的輸入特徵向量。\n- **鍵（K）**：表示序列中每個位置的特徵，用於確定該位置對當前查詢的關聯程度。\n- **值（V）**：與鍵一一對應，代表了可被查詢擷取的輸出信息。\n\n### 計算注意力的過程\n1. **生成 Q、K、V 向量**：對於輸入的每一個位置，模型通過線性變換生成相對應的 Q、K 和 V 向量。這些向量的生成是基於模型的參數進行的。\n\n2. **計算注意力分數**：通過計算查詢向量 Q 和每個鍵向量 K 的內積，來獲取其相似性，生成注意力分數。這些分數反映了當前查詢與序列中所有位置的關聯程度。\n\n3. **使用 Softmax 確定權重**：將注意力分數經過 softmax 函數進行歸一化，轉換為權重，使得所有權重的總和為 1。\n\n4. **加權求和生成輸出**：根據計算出的權重，對所有值向量 V 進行加權求和，以生成最終的輸出表示。這個輸出包括了根據注意力機制加權融合的上下文信息，能夠更好地反映序列中不同位置之間的關係。\n\n這一過程的高效性使得 Transformer 能夠有效地建模長距離依賴，並且支持並行計算，克服了傳統 RNN 在處理長序列時的限制。\n\n### 參考\n在此過程中，自注意力機制的核心特性得到體現，能夠直接分析和處理序列中任意兩個位置之間的關係，使得模型在自然語言處理等任務中更為強大和靈活。\n\n### References\n- [1] test-01.txt",
+          "elapsed_s": 23.701630399998976,
+          "score": 0.6462508921340364
+        },
+        "hybrid": {
+          "answer": "在 Self-Attention 機制中，Q、K 和 V 分別代表查詢向量（Query）、鍵向量（Key）和值向量（Value）。這些向量是從輸入序列中生成的，並在計算注意力權重的過程中扮演著重要角色。具體來說，這三者之間的關係和計算過程如下：\n\n### Q/K/V 的定義\n- **Q (Query)**: 查詢向量，用於表示當前關注的輸入元素，幫助尋找其他元素的相關性。\n- **K (Key)**: 鍵向量，用來標識其他輸入元素的特徵，與查詢向量進行匹配以計算注意力分數。\n- **V (Value)**: 值向量，儲存與鍵相對應的內容資訊，最終的輸出將根據這些值進行加權。\n\n### 計算注意力的步驟\n1. **生成 Q、K、V 向量**: 對於每一個位置的輸入，通過線性變換來獲得其對應的查詢、鍵和值向量。\n2. **計算注意力分數**: 將查詢向量 Q 與所有鍵向量 K 進行內積計算，得到注意力分數，這個分數衡量了 Q 對於每個 K 的關聯程度。\n3. **權重化**: 將注意力分數通過 softmax 函數進行歸一化，生成注意力權重，確保所有權重的總和為 1。\n4. **加權求和**: 使用注意力權重對所有值向量 V 進行加權求和，以生成該位置的最終輸出表示。\n\n這種方式使得模型可以自動學習序列中各個位置之間的相互關聯，並且能夠直接建模任意兩個位置之間的依賴關係，特別是長距離依賴。\n\n### 參考文獻\n### References\n\n- [1] test-01.txt",
+          "elapsed_s": 16.759201900000335,
+          "score": 0.7108639543058666
+        }
+      }
+    },
+    {
+      "id": "q06",
+      "query": "Multi-Head Attention 的目的與直覺是什麼？",
+      "ground_truth": "Multi-head attention 讓模型在不同子空間/不同頭同時關注不同的關聯特徵，能捕捉更豐富的關係；各頭輸出拼接後再線性變換整合。",
+      "query_type": "explain",
+      "expected_best_mode": "hybrid",
+      "by_mode": {
+        "naive": {
+          "answer": "### Multi-Head Attention 的目的與直覺\n\n**目的**：Multi-Head Attention 的主要目的在於增強 Transformer 模型對於不同特徵關係的捕捉能力。這一機制通過將多個注意力頭（attention heads）的輸出結合，讓模型同時從多個不同的表示空間中學習，進而更精細地理解輸入數據中的複雜關係。\n\n**直覺**：\n- 在傳統的注意力機制中，模型只使用一組查詢（query）、鍵（key）和值（value）來計算權重和生成輸出。這意味著模型只能同時關注一種特徵或關係。 \n- 而 Multi-Head Attention 引入了多個頭，每一個頭獨立地計算注意力，從而其在學習過程中能夠專注於不同的特徵。這可以視為給模型提供了多種視角來看待同一輸入。\n- 例如，某一頭可能專注於捕捉句子中的語法結構，而另一頭則可能關注語義信息。最終，這些頭的輸出會被拼接起來，並通過線性變換進一步融合，使得結合後的特徵更加豐富和有信息量。\n\n通過這種方式，Multi-Head Attention 能夠有效提升模型的性能，特別是在處理複雜的自然語言處理任務時，展現了卓越的靈活性與適應性。\n\n### References\n\n- [1] test-01.txt",
+          "elapsed_s": 10.590765299999475,
+          "score": 0.7284580797929322
+        },
+        "local": {
+          "answer": "**Multi-Head Attention** 是 Transformer 模型中的一個關鍵組成部分，其主要目的在於增強模型對輸入序列中不同位置之間關係的理解能力。以下是更詳細的解釋：\n\n### 目的\n\n- **捕捉複雜的特徵關係**：通過將注意力機制分成多個頭，Multi-Head Attention 允許模型同時關注序列中的不同部分，從而捕捉到更加多樣的特徵關聯。這種設計使得模型能夠從多個角度解釋和建模輸入數據。\n\n- **提高學習能力**：每個頭可以學習輸入中的不同子空間，這意味着模型不再局限於單一視角，而是可以從多個方面進行分析。這有助於提高模型的表現力，使其能夠解決更複雜的任務。\n\n### 直覺\n\n- **多樣性**：想象每個頭都像一雙不同的眼睛，這些眼睛各自專注於輸入序列的不同部分。這樣，當它們聚合起來時，就能獲得一個全面的視圖，捕捉到更豐富的信息。\n\n- **並行處理**：由於每個頭的計算是獨立的，使用多頭注意力技術允許在計算上實現並行化，這使得訓練過程更加高效。\n\n通過這種方式，Multi-Head Attention 極大地提升了 Transformer 模型在自然語言處理等任務中的性能，讓其能夠更好地處理長距依賴及複雜的語言結構。\n\n### References\n\n- [1] test-01.txt",
+          "elapsed_s": 12.722715799998696,
+          "score": 0.736835856649112
+        },
+        "global": {
+          "answer": "### Multi-Head Attention的目的與直覺\n\n**Multi-Head Attention**是Transformer架構中的一個關鍵組件，其主要目的是為了提高模型的注意力機制的靈活性和表達能力。以下是它的目的與直覺的詳細說明：\n\n1. **同時捕捉多種關係**：\n   - Multi-Head Attention通過並行使用多個注意力頭來進行特徵提取。每個注意力頭可以學習序列中不同位置之間的關係及其重要性，因此能夠捕捉多種不同的語義或上下文信息。\n\n2. **增加模型的容量**：\n   - 通過引入多個注意力頭，模型的表達能力隨之增加。這意味著它能夠學習更複雜的關係和以上文背景為基礎的信息，從而使得模型在處理各類任務（如翻譯、問答等）時能獲得更好的性能。\n\n3. **提供更深入的上下文理解**：\n   - 多頭機制允許模型在相同的輸入上並行考慮多個表徵，這使得模型在捕捉上下文信息時更加全面。每個頭學到的權重可以專注於不同的特徵，使得最終的表示更為豐富。\n\n### 實現方式\n\n在實現上，Multi-Head Attention將輸入的查詢、鍵和值向量進行多次線性變換，分別生成不同的向量，然後各自計算注意力分數。在獲得這些分數後，將不同頭的輸出拼接在一起，並經過線性變換生成最終的結果。此操作使得模型能有效整合來自不同注意力視角的信息。\n\n### 總結\n\nMulti-Head Attention的主要目的是提升模型在學習上下文資訊上的能力，透過多種視角的注意力進行情報整合，使得Transformer架構在自然語言處理及其他序列建模任務中表現出色。\n\n### References\n\n- [1] test-01.txt",
+          "elapsed_s": 17.297937899998942,
+          "score": 0.726979680485101
+        },
+        "hybrid": {
+          "answer": "**Multi-Head Attention** 是一種在 Transformer 模型中使用的關鍵技術，其目的是提高模型在捕捉不同特徵關係方面的能力。以下是其目的與直覺的概述：\n\n### 目的\n1. **捕捉多樣特徵**：透過將注意力機制分成多個「頭」，Multi-Head Attention 允許模型在同一時間內學習來自不同子空間的特徵，這樣模型可以在處理信息時獲得更豐富的表示。\n\n2. **增強模型表現**：通過同時進行多個注意力計算，Multi-Head Attention 能夠學習到數據中不同關鍵部分之間的相互關係，進一步提升模型的表現能力。\n\n3. **改善捕捉上下文**：在自然語言處理任務中，理解上下文的不同層面（如語意、語法等）是至關重要的，Multi-Head Attention 使模型能夠同時關注這些方面。\n\n### 直覺\n直觀上，Multi-Head Attention 可以被想像為在一個模擬的聚會中，模型的每個注意力頭都是一個與不同話題的專家。每個專家專注於聚會中的特定方面，比如有些專家討論時間、內容或人物角色，這樣一來，最終的輸出就能集合各方的意見，形成更全面的理解。\n\n因此，Multi-Head Attention 通過多個並行的注意力機制來增強模型捕捉信息和關係的能力，從而使Transformer在各種任務中表現更佳。這一技術使得模型能夠在不同的子空間學習關鍵特徵，實現多樣性的信息處理。 \n\n### 參考\n根據知識圖譜及文件內容，Multi-Head Attention 是 Transformer 的一個基本組件，承擔著重要的角色以提高模型的效果。相應的細節可以參見下方的參考文獻。\n\n### References\n\n- [1] test-01.txt",
+          "elapsed_s": 15.83128410000063,
+          "score": 0.7117622170733819
+        }
+      }
+    },
+    {
+      "id": "q07",
+      "query": "文中提到的三個基於 Transformer 的代表模型是哪些？各自偏向什麼任務？",
+      "ground_truth": "BERT（雙向編碼器，偏分類/問答等理解任務）、GPT（單向解碼器，偏生成任務）、T5（text-to-text 統一框架，提升任務彈性）。",
+      "query_type": "fact",
+      "expected_best_mode": "local",
+      "by_mode": {
+        "naive": {
+          "answer": "文中提到的三個基於 Transformer 的代表模型及其各自的任務偏向如下：\n\n1. **BERT（Bidirectional Encoder Representations from Transformers）**\n   - 偏向任務：適合於文本分類和問答等任務，旨在學習上下文信息。\n\n2. **GPT（Generative Pre-trained Transformer）**\n   - 偏向任務：專注於文本生成，採用單向解碼器結構。\n\n3. **T5（Text-To-Text Transfer Transformer）**\n   - 偏向任務：統一了各種 NLP 任務為文本到文本的形式，進一步提升靈活性。\n\n這些模型展示了 Transformer 在自然語言處理領域的應用多樣性，從生成到理解和分類任務都有所覆蓋。\n\n### References\n\n- [1] test-01.txt",
+          "elapsed_s": 6.56883370000287,
+          "score": 0.6049122190727342
+        },
+        "local": {
+          "answer": "文中提到的三個基於 Transformer 的代表模型是：\n\n1. **BERT (Bidirectional Encoder Representations from Transformers)** \n   - **任務偏向**：適合於分類和問答等任務，因為它採用雙向編碼器來學習上下文信息。\n\n2. **GPT (Generative Pre-trained Transformer)** \n   - **任務偏向**：專注於生成任務，使用單向解碼器結構，特別擅長文本生成。\n\n3. **T5 (Text-To-Text Transfer Transformer)** \n   - **任務偏向**：將各種自然語言處理（NLP）任務統一為文本到文本的形式，進一步提升靈活性。\n\n這些模型各自利用 Transformer 架構的特性，針對不同的語言處理任務進行優化。\n\n### References\n\n- [1] test-01.txt",
+          "elapsed_s": 10.2453514000008,
+          "score": 0.6183777435869904
+        },
+        "global": {
+          "answer": "文中提到的三個基於 Transformer 的代表模型是：\n\n1. **BERT (Bidirectional Encoder Representations from Transformers)**:\n   - **偏向任務**：適合於分類和問答等任務，使用雙向編碼器來學習上下文信息。\n\n2. **GPT (Generative Pre-trained Transformer)**:\n   - **偏向任務**：專注於生成任務，採用單向解碼器結構，擅長文本生成。\n\n3. **T5 (Text-To-Text Transfer Transformer)**:\n   - **偏向任務**：統一了各種自然語言處理任務為文本到文本的形式，進一步提升靈活性。\n\n這三個模型各自在不同的自然語言處理任務中發揮著關鍵作用。 \n\n### References\n\n- [1] test-01.txt",
+          "elapsed_s": 9.955088799997611,
+          "score": 0.6221948710699265
+        },
+        "hybrid": {
+          "answer": "文中提到的三個基于 Transformer 的代表模型是：\n\n1. **BERT（Bidirectional Encoder Representations from Transformers）**\n   - **任務偏向**：適合於分類和問答等任務。BERT 採用雙向編碼器來學習上下文信息。\n\n2. **GPT（Generative Pre-trained Transformer）**\n   - **任務偏向**：專注於生成任務，尤其擅長文本生成。GPT 採用單向解碼器結構。\n\n3. **T5（Text-To-Text Transfer Transformer）**\n   - **任務偏向**：統一了多種自然語言處理任務為文本到文本的形式，提升了模型的靈活性。\n\n這些模型各自在不同的應用場景上取得了顯著成就，顯示了 Transformer 架構在自然語言處理領域的多樣性和靈活性。\n\n### References\n\n- [1] test-01.txt",
+          "elapsed_s": 12.687143200000719,
+          "score": 0.6102297132681634
+        }
+      }
+    },
+    {
+      "id": "q08",
+      "query": "文中提到 Transformer 未來發展方向與挑戰各有哪些？",
+      "ground_truth": "方向包含提升計算效率、降低能耗、探索其他領域（如生物資訊、強化學習）；挑戰包含高計算成本與硬體需求，並發展如 Sparse Transformer 等變體與硬體支援來應對。",
+      "query_type": "summary",
+      "expected_best_mode": "hybrid",
+      "by_mode": {
+        "naive": {
+          "answer": "Transformer 的未來發展方向與挑戰主要包括以下幾個方面：\n\n### 發展方向：\n1. **提高計算效率**：隨著模型的規模不斷增長，提高計算效率將是未來的重要研究方向。\n2. **減少能耗**：在不斷追求高效能的同時，如何減少能耗也是一個重要的考量，特別是在大型模型的訓練過程中。\n3. **探索其他應用領域**：除了自然語言處理之外，研究人員也在考慮將 Transformer 應用於其他領域，如生物信息學和強化學習等。\n\n### 挑戰：\n1. **高計算成本**：目前，Transformer 模型的訓練和推理都需要大量的計算資源，這使得許多應用受到限制。\n2. **硬體要求**：隨著模型的不斷增大，對硬體的要求也變得更加嚴格，這可能會影響到其廣泛應用的可能性。\n3. **開發高效的變體**：為了應對高計算成本和能耗的挑戰，研究者正在努力開發更高效的變體，例如 Sparse Transformer。\n\n總體來看，儘管面臨著多項挑戰，Transformer 作為一種具有突破性意義的神經網路架構，仍然有望在多個領域中發揮關鍵的作用。\n\n### References\n- [1] test-01.txt",
+          "elapsed_s": 6.861837300002662,
+          "score": 0.7020533545349638
+        },
+        "local": {
+          "answer": "Transformer 的未來發展方向主要包括以下幾個方面：\n\n1. **提高計算效率**：為了應對高計算成本和能耗的挑戰，研究人員正在探索更高效的變體，例如稀疏 Transformer（Sparse Transformer）。\n   \n2. **探索新應用領域**：Transformer 在生物信息學及強化學習等新領域的潛在應用也正在受到關注，促進其技術的進一步發展。\n\n然而，Transformer 目前面臨著幾項挑戰：\n\n- **高計算成本**：傳統的 Transformer 模型因為計算需求高，對硬體要求苛刻，這限制了其在實際應用中的擴展性。\n  \n- **硬體要求**：由於需要大量資源進行訓練和推論，這使得個人或小型機構難以接觸和使用相關技術。\n\n總體來看，Transformer 作為一種突破性的神經網路架構，具有廣泛的應用潛力，但必須克服上述挑戰以實現更廣泛的應用與發展。\n\n### References\n\n- [1] test-01.txt",
+          "elapsed_s": 11.243889299999864,
+          "score": 0.6956639768975226
+        },
+        "global": {
+          "answer": "Transformer 的未來發展方向與挑戰主要包括以下幾個方面：\n\n### 未來發展方向\n1. **計算效率提升**：研究人員正在尋求方法來提高 Transformer 的計算效率，以適應日益增長的數據處理需求。\n2. **能耗減少**：隨著模型規模的擴大，如何減少能源消耗成為一個重要的研究方向。\n3. **應用領域拓展**：\n   - **生物信息學**：Transformer 被看作用於生物信息學的重要潛在應用方向。\n   - **強化學習**：同樣，強化學習也是 Transformer 萬一的探索範疇之一。\n\n### 挑戰\n1. **高計算成本**：當前的 Transformer 模型在訓練和推斷階段需要大量的計算資源，這使得使用該技術需消耗較高的資源。\n2. **硬體需求**：傳統的 Transformer 結構通常對硬體的要求較高，特別是在大規模部署時。\n\n此外，為了應對這些挑戰，開發更高效的變體（如 Sparse Transformer）和新的硬體支持是目前的研究熱點[1]。 \n\n### References\n- [1] test-01.txt",
+          "elapsed_s": 13.73034750000079,
+          "score": 0.7299407530741926
+        },
+        "hybrid": {
+          "answer": "Transformer 模型的未來發展方向和挑戰主要體現在以下幾個方面：\n\n### 發展方向\n\n- **提高計算效率與減少能耗**：研究人員正致力於優化 Transformer 模型，使其在計算上更高效，並降低運行所需的能源。\n- **探索新應用領域**：Transformer 技術的應用正在擴展到生物信息學和強化學習等新的領域，以發掘其潛在的應用價值。\n- **開發高效變體**：研究如 Sparse Transformer 等高效變體，以應對傳統 Transformer 在計算成本和硬體要求上的挑戰。\n\n### 挑戰\n\n- **高計算成本**：目前 Transformer 的模型訓練和運行需求相對較高，這可能限制了其在某些場景中的應用。\n- **硬體需求**：需要更強大的硬體支持，這對資源有限的研究機構或小型企業可能造成困難。\n\n總的來說，Transformer 作為一種深具潛力的神經網路架構，未來仍需克服一定的技術挑戰，並在多個領域內進行更深入的探索和應用。\n\n### References\n\n- [1] test-01.txt",
+          "elapsed_s": 16.565224199999648,
+          "score": 0.675084518890635
+        }
+      }
+    }
+  ],
+  "aggregate": {
+    "naive": {
+      "avg_score": 0.7238897077293197,
+      "avg_elapsed_s": 8.675327562501025
+    },
+    "local": {
+      "avg_score": 0.7109636587257677,
+      "avg_elapsed_s": 12.17508933750014
+    },
+    "global": {
+      "avg_score": 0.7184279566308751,
+      "avg_elapsed_s": 14.159289474999696
+    },
+    "hybrid": {
+      "avg_score": 0.71648596524916,
+      "avg_elapsed_s": 14.42537164999976
+    }
+  }
+}

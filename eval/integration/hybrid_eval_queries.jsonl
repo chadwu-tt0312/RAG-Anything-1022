@@ -1,0 +1,8 @@
+{"id":"q01","query":"Transformer 最初是在哪一年、由哪篇論文提出？","ground_truth":"Transformer 最初由 Vaswani 等人在 2017 年的論文《Attention Is All You Need》中提出。","query_type":"fact","expected_best_mode":"naive"}
+{"id":"q02","query":"Transformer 相對於 RNN（例如 LSTM/GRU）主要改善了哪些問題？","ground_truth":"相較 RNN 的序列化計算與長序列下的梯度問題，Transformer 透過 self-attention 支援高度並行計算並更有效建模長距離依賴，降低效率瓶頸與長距依賴困難。","query_type":"explain","expected_best_mode":"hybrid"}
+{"id":"q03","query":"為什麼 Transformer 需要 Positional Encoding？常見做法是什麼？","ground_truth":"因 Transformer 不像 RNN 具備天然的順序處理特性，需要用 Positional Encoding 提供序列位置資訊；常見做法是使用正弦/餘弦函數生成位置編碼。","query_type":"explain","expected_best_mode":"local"}
+{"id":"q04","query":"Transformer 的兩個主要部分是什麼？它們各自的作用是什麼？","ground_truth":"Transformer 由 Encoder 與 Decoder 組成。Encoder 將輸入序列轉換為上下文豐富表示；Decoder 依據 Encoder 輸出生成輸出序列，並包含 masked attention 等設計。","query_type":"summary","expected_best_mode":"hybrid"}
+{"id":"q05","query":"Self-Attention 的 Q/K/V 各代表什麼？概念上怎麼用來計算注意力？","ground_truth":"Self-attention 對每個位置經線性變換得到 Query/Key/Value。以 Query 與各 Key 的內積得到注意力分數，經 softmax 成為權重，再對 Value 加權求和得到該位置的輸出表示。","query_type":"explain","expected_best_mode":"hybrid"}
+{"id":"q06","query":"Multi-Head Attention 的目的與直覺是什麼？","ground_truth":"Multi-head attention 讓模型在不同子空間/不同頭同時關注不同的關聯特徵，能捕捉更豐富的關係；各頭輸出拼接後再線性變換整合。","query_type":"explain","expected_best_mode":"hybrid"}
+{"id":"q07","query":"文中提到的三個基於 Transformer 的代表模型是哪些？各自偏向什麼任務？","ground_truth":"BERT（雙向編碼器，偏分類/問答等理解任務）、GPT（單向解碼器，偏生成任務）、T5（text-to-text 統一框架，提升任務彈性）。","query_type":"fact","expected_best_mode":"local"}
+{"id":"q08","query":"文中提到 Transformer 未來發展方向與挑戰各有哪些？","ground_truth":"方向包含提升計算效率、降低能耗、探索其他領域（如生物資訊、強化學習）；挑戰包含高計算成本與硬體需求，並發展如 Sparse Transformer 等變體與硬體支援來應對。","query_type":"summary","expected_best_mode":"hybrid"}

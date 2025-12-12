@@ -13,6 +13,7 @@ import re
 import json
 import time
 import base64
+import inspect
 from typing import Dict, Any, Tuple, List
 from pathlib import Path
 from dataclasses import dataclass
@@ -81,9 +82,7 @@ class ContextExtractor:
         try:
             # Use format hint if provided, otherwise auto-detect
             if content_format == "minerU" and isinstance(content_source, list):
-                return self._extract_from_content_list(
-                    content_source, current_item_info
-                )
+                return self._extract_from_content_list(content_source, current_item_info)
             elif content_format == "text_chunks" and isinstance(content_source, list):
                 return self._extract_from_text_chunks(content_source, current_item_info)
             elif content_format == "text" and isinstance(content_source, str):
@@ -91,29 +90,19 @@ class ContextExtractor:
             else:
                 # Auto-detect content source format
                 if isinstance(content_source, list):
-                    return self._extract_from_content_list(
-                        content_source, current_item_info
-                    )
+                    return self._extract_from_content_list(content_source, current_item_info)
                 elif isinstance(content_source, dict):
-                    return self._extract_from_dict_source(
-                        content_source, current_item_info
-                    )
+                    return self._extract_from_dict_source(content_source, current_item_info)
                 elif isinstance(content_source, str):
-                    return self._extract_from_text_source(
-                        content_source, current_item_info
-                    )
+                    return self._extract_from_text_source(content_source, current_item_info)
                 else:
-                    logger.warning(
-                        f"Unsupported content source type: {type(content_source)}"
-                    )
+                    logger.warning(f"Unsupported content source type: {type(content_source)}")
                     return ""
         except Exception as e:
             logger.error(f"Error extracting context: {e}")
             return ""
 
-    def _extract_from_content_list(
-        self, content_list: List[Dict], current_item_info: Dict
-    ) -> str:
+    def _extract_from_content_list(self, content_list: List[Dict], current_item_info: Dict) -> str:
         """Extract context from MinerU-style content list
 
         Args:
@@ -130,9 +119,7 @@ class ContextExtractor:
         else:
             return self._extract_page_context(content_list, current_item_info)
 
-    def _extract_page_context(
-        self, content_list: List[Dict], current_item_info: Dict
-    ) -> str:
+    def _extract_page_context(self, content_list: List[Dict], current_item_info: Dict) -> str:
         """Extract context based on page boundaries
 
         Args:
@@ -155,10 +142,7 @@ class ContextExtractor:
             item_type = item.get("type", "")
 
             # Check if item is within context window and matches filter criteria
-            if (
-                start_page <= item_page < end_page
-                and item_type in self.config.filter_content_types
-            ):
+            if start_page <= item_page < end_page and item_type in self.config.filter_content_types:
                 text_content = self._extract_text_from_item(item)
                 if text_content and text_content.strip():
                     # Add page marker for better context understanding
@@ -170,9 +154,7 @@ class ContextExtractor:
         context = "\n".join(context_texts)
         return self._truncate_context(context)
 
-    def _extract_chunk_context(
-        self, content_list: List[Dict], current_item_info: Dict
-    ) -> str:
+    def _extract_chunk_context(self, content_list: List[Dict], current_item_info: Dict) -> str:
         """Extract context based on content chunks
 
         Args:
@@ -235,9 +217,7 @@ class ContextExtractor:
 
         return ""
 
-    def _extract_from_dict_source(
-        self, dict_source: Dict, current_item_info: Dict
-    ) -> str:
+    def _extract_from_dict_source(self, dict_source: Dict, current_item_info: Dict) -> str:
         """Extract context from dictionary-based content source
 
         Args:
@@ -262,9 +242,7 @@ class ContextExtractor:
 
         return self._truncate_context(context)
 
-    def _extract_from_text_source(
-        self, text_source: str, current_item_info: Dict
-    ) -> str:
+    def _extract_from_text_source(self, text_source: str, current_item_info: Dict) -> str:
         """Extract context from plain text source
 
         Args:
@@ -276,9 +254,7 @@ class ContextExtractor:
         """
         return self._truncate_context(text_source)
 
-    def _extract_from_text_chunks(
-        self, text_chunks: List[str], current_item_info: Dict
-    ) -> str:
+    def _extract_from_text_chunks(self, text_chunks: List[str], current_item_info: Dict) -> str:
         """Extract context from simple text chunks list
 
         Args:
@@ -431,9 +407,7 @@ class BaseModalProcessor:
                 self.content_source, item_info, self.content_format
             )
             if context:
-                logger.debug(
-                    f"Extracted context of length {len(context)} for item: {item_info}"
-                )
+                logger.debug(f"Extracted context of length {len(context)} for item: {item_info}")
             return context
         except Exception as e:
             logger.error(f"Error getting context for item {item_info}: {e}")
@@ -512,9 +486,7 @@ class BaseModalProcessor:
             "created_at": int(time.time()),
         }
 
-        await self.knowledge_graph_inst.upsert_node(
-            entity_info["entity_name"], node_data
-        )
+        await self.knowledge_graph_inst.upsert_node(entity_info["entity_name"], node_data)
 
         # Insert entity into vector database
         entity_vdb_data = {
@@ -659,9 +631,7 @@ class BaseModalProcessor:
         entity_type = type_match.group(1) if type_match else "unknown"
 
         # Extract summary
-        summary_match = re.search(
-            r'"summary":\s*"([^"]*(?:\\.[^"]*)*)"', response, re.DOTALL
-        )
+        summary_match = re.search(r'"summary":\s*"([^"]*(?:\\.[^"]*)*)"', response, re.DOTALL)
         summary = summary_match.group(1) if summary_match else description[:100]
 
         return {
@@ -736,9 +706,7 @@ class BaseModalProcessor:
                         entity_name, modal_entity_name, relation_data
                     )
 
-                    relation_id = compute_mdhash_id(
-                        entity_name + modal_entity_name, prefix="rel-"
-                    )
+                    relation_id = compute_mdhash_id(entity_name + modal_entity_name, prefix="rel-")
                     relation_vdb_data = {
                         relation_id: {
                             "src_id": entity_name,
@@ -797,6 +765,70 @@ class ImageModalProcessor(BaseModalProcessor):
         """
         super().__init__(lightrag, modal_caption_func, context_extractor)
 
+    def _check_func_supports_image_data(self, func) -> bool:
+        """Check if function supports image_data parameter"""
+        try:
+            sig = inspect.signature(func)
+            return "image_data" in sig.parameters
+        except (ValueError, TypeError):
+            # If we can't inspect, assume it doesn't support image_data
+            return False
+
+    async def _call_vision_model_safe(
+        self, prompt: str, image_data: str = None, system_prompt: str = None, **kwargs
+    ):
+        """Safely call vision model function, handling image_data parameter"""
+        if not image_data:
+            # No image data, call normally
+            return await self.modal_caption_func(prompt, system_prompt=system_prompt, **kwargs)
+
+        # Check if function supports image_data parameter
+        if not self._check_func_supports_image_data(self.modal_caption_func):
+            # Function doesn't support image_data, convert to messages format
+            messages = []
+            if system_prompt:
+                messages.append({"role": "system", "content": system_prompt})
+            messages.append(
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": prompt},
+                        {
+                            "type": "image_url",
+                            "image_url": {"url": f"data:image/jpeg;base64,{image_data}"},
+                        },
+                    ],
+                }
+            )
+            # Try calling with messages parameter
+            try:
+                sig = inspect.signature(self.modal_caption_func)
+                if "messages" in sig.parameters:
+                    # Remove image_data from kwargs to avoid passing it to underlying API
+                    kwargs_clean = {k: v for k, v in kwargs.items() if k != "image_data"}
+                    return await self.modal_caption_func(
+                        prompt="", messages=messages, system_prompt=None, **kwargs_clean
+                    )
+            except (ValueError, TypeError):
+                pass
+            # If messages doesn't work, log warning and fallback to text-only
+            logger.warning(
+                "modal_caption_func doesn't support image_data or messages, falling back to text-only. "
+                "Consider providing a vision_model_func that supports image_data parameter."
+            )
+            # Remove image_data from kwargs to avoid passing it to underlying API
+            kwargs_clean = {k: v for k, v in kwargs.items() if k != "image_data"}
+            return await self.modal_caption_func(
+                prompt, system_prompt=system_prompt, **kwargs_clean
+            )
+        else:
+            # Function supports image_data, call directly
+            # Still remove image_data from kwargs to avoid duplicate parameter
+            kwargs_clean = {k: v for k, v in kwargs.items() if k != "image_data"}
+            return await self.modal_caption_func(
+                prompt, image_data=image_data, system_prompt=system_prompt, **kwargs_clean
+            )
+
     def _encode_image_to_base64(self, image_path: str) -> str:
         """Encode image to base64"""
         try:
@@ -838,18 +870,12 @@ class ImageModalProcessor(BaseModalProcessor):
                 content_data = modal_content
 
             image_path = content_data.get("img_path")
-            captions = content_data.get(
-                "image_caption", content_data.get("img_caption", [])
-            )
-            footnotes = content_data.get(
-                "image_footnote", content_data.get("img_footnote", [])
-            )
+            captions = content_data.get("image_caption", content_data.get("img_caption", []))
+            footnotes = content_data.get("image_footnote", content_data.get("img_footnote", []))
 
             # Validate image path
             if not image_path:
-                raise ValueError(
-                    f"No image path provided in modal_content: {modal_content}"
-                )
+                raise ValueError(f"No image path provided in modal_content: {modal_content}")
 
             # Convert to Path object and check if it exists
             image_path_obj = Path(image_path)
@@ -889,8 +915,8 @@ class ImageModalProcessor(BaseModalProcessor):
             if not image_base64:
                 raise RuntimeError(f"Failed to encode image to base64: {image_path}")
 
-            # Call vision model with encoded image
-            response = await self.modal_caption_func(
+            # Call vision model with encoded image (safely handle image_data parameter)
+            response = await self._call_vision_model_safe(
                 vision_prompt,
                 image_data=image_base64,
                 system_prompt=PROMPTS["IMAGE_ANALYSIS_SYSTEM"],
@@ -941,12 +967,8 @@ class ImageModalProcessor(BaseModalProcessor):
                 content_data = modal_content
 
             image_path = content_data.get("img_path", "")
-            captions = content_data.get(
-                "image_caption", content_data.get("img_caption", [])
-            )
-            footnotes = content_data.get(
-                "image_footnote", content_data.get("img_footnote", [])
-            )
+            captions = content_data.get("image_caption", content_data.get("img_caption", []))
+            footnotes = content_data.get("image_footnote", content_data.get("img_footnote", []))
 
             modal_chunk = PROMPTS["image_chunk"].format(
                 image_path=image_path,
@@ -976,9 +998,7 @@ class ImageModalProcessor(BaseModalProcessor):
             }
             return str(modal_content), fallback_entity
 
-    def _parse_response(
-        self, response: str, entity_name: str = None
-    ) -> Tuple[str, Dict[str, Any]]:
+    def _parse_response(self, response: str, entity_name: str = None) -> Tuple[str, Dict[str, Any]]:
         """Parse model response"""
         try:
             response_data = self._robust_json_parse(response)
@@ -989,9 +1009,7 @@ class ImageModalProcessor(BaseModalProcessor):
             if not description or not entity_data:
                 raise ValueError("Missing required fields in response")
 
-            if not all(
-                key in entity_data for key in ["entity_name", "entity_type", "summary"]
-            ):
+            if not all(key in entity_data for key in ["entity_name", "entity_type", "summary"]):
                 raise ValueError("Missing required fields in entity_info")
 
             entity_data["entity_name"] = (
@@ -1064,9 +1082,7 @@ class TableModalProcessor(BaseModalProcessor):
                     "table_prompt_with_context", PROMPTS["table_prompt"]
                 ).format(
                     context=context,
-                    entity_name=entity_name
-                    if entity_name
-                    else "descriptive name for this table",
+                    entity_name=entity_name if entity_name else "descriptive name for this table",
                     table_img_path=table_img_path,
                     table_caption=table_caption if table_caption else "None",
                     table_body=table_body,
@@ -1074,9 +1090,7 @@ class TableModalProcessor(BaseModalProcessor):
                 )
             else:
                 table_prompt = PROMPTS["table_prompt"].format(
-                    entity_name=entity_name
-                    if entity_name
-                    else "descriptive name for this table",
+                    entity_name=entity_name if entity_name else "descriptive name for this table",
                     table_img_path=table_img_path,
                     table_caption=table_caption if table_caption else "None",
                     table_body=table_body,
@@ -1090,9 +1104,7 @@ class TableModalProcessor(BaseModalProcessor):
             )
 
             # Parse response (reuse existing logic)
-            enhanced_caption, entity_info = self._parse_table_response(
-                response, entity_name
-            )
+            enhanced_caption, entity_info = self._parse_table_response(response, entity_name)
 
             return enhanced_caption, entity_info
 
@@ -1183,9 +1195,7 @@ class TableModalProcessor(BaseModalProcessor):
             if not description or not entity_data:
                 raise ValueError("Missing required fields in response")
 
-            if not all(
-                key in entity_data for key in ["entity_name", "entity_type", "summary"]
-            ):
+            if not all(key in entity_data for key in ["entity_name", "entity_type", "summary"]):
                 raise ValueError("Missing required fields in entity_info")
 
             entity_data["entity_name"] = (
@@ -1278,9 +1288,7 @@ class EquationModalProcessor(BaseModalProcessor):
             )
 
             # Parse response (reuse existing logic)
-            enhanced_caption, entity_info = self._parse_equation_response(
-                response, entity_name
-            )
+            enhanced_caption, entity_info = self._parse_equation_response(response, entity_name)
 
             return enhanced_caption, entity_info
 
@@ -1367,9 +1375,7 @@ class EquationModalProcessor(BaseModalProcessor):
             if not description or not entity_data:
                 raise ValueError("Missing required fields in response")
 
-            if not all(
-                key in entity_data for key in ["entity_name", "entity_type", "summary"]
-            ):
+            if not all(key in entity_data for key in ["entity_name", "entity_type", "summary"]):
                 raise ValueError("Missing required fields in entity_info")
 
             entity_data["entity_name"] = (
@@ -1446,9 +1452,7 @@ class GenericModalProcessor(BaseModalProcessor):
             # Call LLM for generic analysis
             response = await self.modal_caption_func(
                 generic_prompt,
-                system_prompt=PROMPTS["GENERIC_ANALYSIS_SYSTEM"].format(
-                    content_type=content_type
-                ),
+                system_prompt=PROMPTS["GENERIC_ANALYSIS_SYSTEM"].format(content_type=content_type),
             )
 
             # Parse response (reuse existing logic)
@@ -1529,9 +1533,7 @@ class GenericModalProcessor(BaseModalProcessor):
             if not description or not entity_data:
                 raise ValueError("Missing required fields in response")
 
-            if not all(
-                key in entity_data for key in ["entity_name", "entity_type", "summary"]
-            ):
+            if not all(key in entity_data for key in ["entity_name", "entity_type", "summary"]):
                 raise ValueError("Missing required fields in entity_info")
 
             entity_data["entity_name"] = (

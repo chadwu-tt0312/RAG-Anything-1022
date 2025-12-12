@@ -1,0 +1,33 @@
+<View>
+  <!-- 建立標註區塊(region)之間的關係 -->
+  <Relations>
+    <Relation value="belongs_to" />
+    <Relation value="implements" />
+    <Relation value="depends_on" />
+    <Relation value="uses" />
+    <Relation value="proposes" />
+    <Relation value="compares_with" />
+    <Relation value="describes" />
+    <Relation value="contains" />
+  </Relations>
+
+  <!-- 先標註實體，再用關係把兩個實體連起來 -->
+  <Labels name="label" toName="text">
+    <!-- RAG-Anything 風格 entity types（含擴充 DATE） -->
+    <Label value="TECHNICAL_TERM" background="#FF6B6B"/>
+    <Label value="SYSTEM_COMPONENT" background="#4D96FF"/>
+    <Label value="PERSON" background="#6BCB77"/>
+    <Label value="ORGANIZATION" background="#FFD93D"/>
+    <Label value="DATE" background="#A66CFF"/>
+
+    <!-- 多模態內容（若你標註的是 PDF/MD 且希望把 Figure/Table/Equation 也當成 entity） -->
+    <Label value="IMAGE" background="#FF9F1C"/>
+    <Label value="TABLE" background="#2EC4B6"/>
+    <Label value="EQUATION" background="#8D99AE"/>
+  </Labels>
+
+  <!-- 顯示文本內容 -->
+  <Text name="text" value="$text"/>
+</View>
+
+

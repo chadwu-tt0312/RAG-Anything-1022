@@ -124,9 +124,17 @@ RAG-Anything 目前為**純開源專案**，未提供企業版或雲端版。所
 
 ### 進階功能測試
 - [x] 批次處理效能測試
-- [ ] 知識圖譜建立正確性驗證
-  - 標註工具無法使用，無法與 RAG-Anything 輸出的比較。無從驗證
-- [ ] 混合檢索模式準確度測試
+- [x] 知識圖譜建立正確性驗證
+  - 已改用 **Label Studio** 進行「實體 + 關係」標註並匯出 JSON，可與 RAG-Anything 輸出比對（見 `eval/test_data_preparation_guide.md`）
+  - 實體提取精確率（Precision）= 0% (entity_metrics_loose)
+  - 實體提取召回率（Recall）= 0%
+  - 關係提取精確率（Precision）= 0% (relation_metrics_loose)
+  - 關係提取召回率（Recall）= 0%
+- [x] 混合檢索模式準確度測試
+  - [PASS] Hybrid 模式在複雜查詢上的平均分數 >= 0.70
+  - [PASS] Hybrid 模式優於至少一種單一模式的比例 >= 30% (實際: 50.0%)
+  - [PASS] 所有模式的回應時間都在可接受範圍內 (<=30秒)
+  - [PASS] Hybrid 模式平均檢索到足夠的上下文項目 (>=5, 實際: 44.1)
 - [ ] VLM 增強查詢功能測試
 - [ ] Azure OpenAI 整合測試
 
@@ -163,10 +171,10 @@ RAG-Anything 目前為**純開源專案**，未提供企業版或雲端版。所
    - 選擇包含明確實體與關係的文件（如技術文件、學術論文）
    - 文件應包含圖片、表格、公式等多模態內容
    - 預先標註預期提取的實體與關係（ground truth）
-   - **詳細指南**：請參考 `eval/test_data_preparation_guide.md`，包含：
+   - **詳細指南**：請參考 `eval/Ground Truth 標註指南.md`，包含：
      - 測試文件範本來源（arXiv、技術文件等）
-     - Ground truth 標註方法（BRAT、doccano 工具使用）
-     - 標註格式定義與轉換腳本
+     - Ground truth 標註方法（Label Studio：text span + relations）
+     - Label Studio project config（XML）、匯出與轉換腳本
      - 與 RAG-Anything 輸出的比較方法
 
 2. **執行文件處理**：
@@ -258,110 +266,39 @@ RAG-Anything 目前為**純開源專案**，未提供企業版或雲端版。所
 - 驗證混合檢索（hybrid）模式是否優於單一模式
 - 確認向量相似度搜尋與圖譜遍歷的整合效果
 
-**測試方法：**
+**測試方法（可重現、可量化）：**
 
-1. **準備測試查詢集**：
-   - 建立 20-50 個涵蓋不同複雜度的查詢
-   - 查詢類型應包含：
-     - 簡單事實查詢（適合 naive 模式）
-     - 實體相關查詢（適合 local 模式）
-     - 關係查詢（適合 global 模式）
-     - 複雜綜合查詢（適合 hybrid 模式）
-   - 為每個查詢準備標準答案（ground truth）
+> 本測試用 **embedding cosine similarity** 量化「答案 vs ground truth」相似度（答案相似度）。  
+> 若你想改用 LLM-as-judge（讓 LLM 當裁判打分），我可以再補一版評估器，但會有額外成本與主觀性風險。
 
-2. **執行不同模式的查詢**：
-    ```python
-    # 測試查詢集
-    test_queries = [
-        {
-            "query": "文件的主要內容是什麼？",
-            "expected_mode": "naive",
-            "ground_truth": "預期答案..."
-        },
-        {
-            "query": "圖表 A 顯示了什麼數據？",
-            "expected_mode": "local",
-            "ground_truth": "預期答案..."
-        },
-        {
-            "query": "實體 A 與實體 B 的關係是什麼？",
-            "expected_mode": "global",
-            "ground_truth": "預期答案..."
-        },
-        {
-            "query": "綜合分析文件中的關鍵概念及其相互關係",
-            "expected_mode": "hybrid",
-            "ground_truth": "預期答案..."
-        }
-    ]
+1. **準備測試資料與查詢集**：
+   - 測試文件：可用 `eval/docs/test-01.txt`（純文字、快速跑通）
+   - 查詢集：使用 JSONL（每行一個 JSON），欄位包含 `id/query/ground_truth`（可選 `query_type/expected_best_mode`）
+   - 專案已提供可直接使用的範例：`eval/integration/hybrid_eval_queries.jsonl`
 
-    # 測試所有模式
-    modes = ["naive", "local", "global", "hybrid"]
-    results = {}
+2. **執行測試（naive/local/global/hybrid）**：
+   - 直接跑現成腳本：`eval/integration/hybrid_retrieval_accuracy_eval.py`
 
-    for test_case in test_queries:
-        query = test_case["query"]
-        results[query] = {}
-        
-        for mode in modes:
-            result = await rag.aquery(query, mode=mode)
-            results[query][mode] = {
-                "response": result,
-                "response_length": len(result),
-                "timestamp": time.time()
-            }
-            print(f"\n[{mode}] 查詢: {query[:50]}...")
-            print(f"回應長度: {len(result)} 字元")
-    ```
+   ```powershell
+   # 先設定 .env 或環境變數（至少要有 LLM_BINDING_API_KEY）
+   uv run eval/integration/hybrid_retrieval_accuracy_eval.py `
+     --docs eval/docs/test-01.txt `
+     --query-set eval/integration/hybrid_eval_queries.jsonl `
+     --working-dir eval/integration/rag_storage_hybrid_eval `
+     --modes naive local global hybrid `
+     --out-dir eval/integration/results
+   ```
 
-3. **評估回應品質**：
-    ```python
-    from sklearn.metrics.pairwise import cosine_similarity
-    import numpy as np
+3. **產出物（可提交審查/可追溯）**：
+   - `eval/integration/results/hybrid_retrieval_accuracy/<timestamp>/results.json`
+     - 含每題每模式：答案、耗時、cosine 分數、彙總平均
+   - `eval/integration/results/hybrid_retrieval_accuracy/<timestamp>/results.csv`
+     - 適合丟 Excel/BI 做圖表
 
-    def evaluate_response_quality(predicted, ground_truth, embedding_func):
-        """使用 embedding 相似度評估回應品質"""
-        pred_embedding = embedding_func([predicted])[0]
-        gt_embedding = embedding_func([ground_truth])[0]
-        similarity = cosine_similarity([pred_embedding], [gt_embedding])[0][0]
-        return similarity
-
-    # 評估每個查詢的結果
-    evaluation_results = {}
-    for query, mode_results in results.items():
-        evaluation_results[query] = {}
-        ground_truth = next(tc["ground_truth"] for tc in test_queries if tc["query"] == query)
-        
-        for mode, result_data in mode_results.items():
-            similarity = evaluate_response_quality(
-                result_data["response"],
-                ground_truth,
-                embedding_func
-            )
-            evaluation_results[query][mode] = {
-                "similarity": similarity,
-                "response_length": result_data["response_length"]
-            }
-    ```
-
-4. **比較模式效能**：
-   - 計算各模式的平均相似度分數
-   - 統計各模式的回應時間
-   - 分析不同查詢類型的最佳模式
-   - 驗證 hybrid 模式在複雜查詢上的優勢
-
-5. **驗證檢索相關性**：
-    ```python
-    # 檢查檢索到的上下文相關性
-    query_param = QueryParam(mode="hybrid", only_need_prompt=True)
-    retrieved_prompt = await rag.lightrag.aquery(
-        "測試查詢",
-        param=query_param
-    )
-
-    # 分析檢索到的實體與關係
-    # 驗證是否包含相關內容
-    ```
+4. **如何判讀結果**：
+   - **平均分數（avg_score）**：越高越接近 ground truth
+   - **平均耗時（avg_elapsed_s）**：越低越好
+   - 建議再按 `query_type` 分組（事實/解釋/摘要），看 hybrid 在複雜題是否優勢更明顯
 
 **驗收標準：**
 - Hybrid 模式在複雜查詢上的相似度分數 ≥ 0.75
@@ -379,113 +316,32 @@ RAG-Anything 目前為**純開源專案**，未提供企業版或雲端版。所
 - 驗證 VLM 增強查詢的回應品質優於純文字查詢
 - 確認系統在無圖片時能正確降級為純文字查詢
 
-**測試方法：**
+**測試方法（可重現、可驗證 VLM 流程是否真的被走到）：**
 
-1. **準備包含圖片的測試文件**：
-   - 選擇包含圖表、流程圖、示意圖的 PDF 文件
-   - 確保圖片有明確的語義內容（如數據圖表、技術圖解）
+核心判準：VLM enhanced query 需要在檢索 prompt 中出現 `Image Path: ...`，系統才會抓圖、轉 base64、以 multimodal messages 呼叫 `vision_model_func`。
 
-2. **處理文件並啟用 VLM**：
-    ```python
-    # 初始化時提供 vision_model_func
-    def vision_model_func(
-        prompt, system_prompt=None, history_messages=[],
-        image_data=None, messages=None, **kwargs
-    ):
-        if messages:
-            # 多圖片格式（VLM enhanced query 使用）
-            return openai_complete_if_cache(
-                "gpt-4o",
-                "",
-                messages=messages,
-                api_key=api_key,
-                base_url=base_url,
-                **kwargs,
-            )
-        elif image_data:
-            # 單圖片格式
-            return openai_complete_if_cache(
-                "gpt-4o",
-                "",
-                messages=[{
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": prompt},
-                        {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{image_data}"}}
-                    ]
-                }],
-                api_key=api_key,
-                base_url=base_url,
-                **kwargs,
-            )
-        else:
-            return llm_model_func(prompt, system_prompt, history_messages, **kwargs)
+1. **準備含圖片的測試資料**：
+   - 可直接用 repo 現有圖檔：`eval/docs/全球資訊服務暨軟體市場規模.png`、`eval/docs/cat-01.jpg` 等
 
-    rag = RAGAnything(
-        config=config,
-        llm_model_func=llm_model_func,
-        vision_model_func=vision_model_func,  # 提供 VLM 函數
-        embedding_func=embedding_func,
-    )
+2. **執行測試腳本（同題目 VLM on/off 對照）**：
 
-    # 處理包含圖片的文件
-    await rag.process_document_complete(
-        file_path="document_with_images.pdf",
-        output_dir="./output"
-    )
-    ```
+   ```powershell
+   python eval/integration/vlm_enhanced_query_eval.py `
+     --docs eval/docs/全球資訊服務暨軟體市場規模.png eval/docs/cat-01.jpg `
+     --working-dir eval/integration/rag_storage_vlm_eval `
+     --out-dir eval/integration/results `
+     --mode hybrid
+   ```
 
-3. **執行 VLM 增強查詢**：
-    ```python
-    # 測試圖片相關查詢
-    image_queries = [
-        "文件中的圖表顯示了什麼趨勢？",
-        "分析第一張圖片的內容",
-        "圖表 A 與圖表 B 的差異是什麼？",
-        "根據圖表數據，預測未來的發展趨勢"
-    ]
+3. **產出物與驗證點**：
+   - `eval/integration/results/vlm_enhanced_query/<timestamp>/results.json`
+     - 每題會包含：
+       - `retrieval_prompt_image_path_count`：檢索 prompt 出現 `Image Path:` 次數（>0 才有機會進 VLM）
+       - `runs.False`：`vlm_enhanced=False` 的文字-only 回答
+       - `runs.True`：`vlm_enhanced=True` 的 VLM 回答
 
-    # 啟用 VLM 增強查詢
-    for query in image_queries:
-        print(f"\n查詢: {query}")
-        
-        # VLM 增強查詢（自動啟用）
-        vlm_result = await rag.aquery(query, mode="hybrid", vlm_enhanced=True)
-        print(f"VLM 增強結果: {vlm_result[:200]}...")
-        
-        # 對比：純文字查詢（禁用 VLM）
-        text_result = await rag.aquery(query, mode="hybrid", vlm_enhanced=False)
-        print(f"純文字結果: {text_result[:200]}...")
-    ```
-
-4. **驗證圖片處理流程**：
-    ```python
-    # 檢查 VLM enhanced query 的內部處理
-    # 查看 query.py 中的 aquery_vlm_enhanced 方法
-
-    # 驗證圖片路徑提取
-    # 驗證 base64 編碼
-    # 驗證 messages 格式正確性
-    ```
-
-5. **評估回應品質**：
-   - 比較 VLM 增強查詢與純文字查詢的回應
-   - 驗證 VLM 是否能正確識別圖片內容
-   - 確認圖片分析結果與實際圖片內容一致
-   - 測試多圖片查詢的處理能力
-
-6. **測試降級機制**：
-    ```python
-    # 測試無圖片文件
-    await rag.process_document_complete(
-        file_path="text_only_document.pdf",
-        output_dir="./output"
-    )
-
-    # 嘗試 VLM 增強查詢（應降級為純文字）
-    result = await rag.aquery("文件內容是什麼？", mode="hybrid")
-    # 應不會報錯，而是使用純文字查詢
-    ```
+4. **降級（fallback）測試**：
+   - 若 `retrieval_prompt_image_path_count == 0`，系統會自動 fallback 回一般文字 query（不應報錯）
 
 **驗收標準：**
 - VLM 增強查詢能正確識別圖片內容（準確率 ≥ 85%）
@@ -504,130 +360,34 @@ RAG-Anything 目前為**純開源專案**，未提供企業版或雲端版。所
 - 驗證 LLM 與 Embedding 功能在 Azure 環境下正常運作
 - 確認 API 版本與部署名稱配置正確
 
-**測試方法：**
+**測試方法（最小可行 smoketest + 端到端 RAG）：**
 
-1. **配置 Azure OpenAI 環境變數**：
-    ```bash
-    # .env 檔案或環境變數
-    LLM_BINDING=azure_openai
-    LLM_BINDING_HOST=https://your-resource.openai.azure.com
-    LLM_BINDING_API_KEY=your-azure-api-key
-    AZURE_OPENAI_API_VERSION=2024-08-01-preview
-    AZURE_OPENAI_DEPLOYMENT=gpt-4o
-    LLM_MODEL=gpt-4o
+1. **設定 Azure OpenAI 環境變數（deployment / api_version 都必填）**：
 
-    # Embedding 配置（如使用 Azure）
-    EMBEDDING_BINDING=azure_openai
-    EMBEDDING_BINDING_HOST=https://your-resource.openai.azure.com
-    EMBEDDING_BINDING_API_KEY=your-azure-api-key
-    AZURE_EMBEDDING_DEPLOYMENT=text-embedding-3-large
-    AZURE_EMBEDDING_API_VERSION=2023-05-15
-    EMBEDDING_MODEL=text-embedding-3-large
-    EMBEDDING_DIM=3072
-    ```
+   ```bash
+   LLM_BINDING_HOST=https://your-resource.openai.azure.com
+   LLM_BINDING_API_KEY=your-azure-api-key
+   AZURE_OPENAI_API_VERSION=2024-08-01-preview
+   AZURE_OPENAI_DEPLOYMENT=your-chat-deployment
 
-2. **測試連線與基本功能**：
-    ```python
-    import os
-    from lightrag.llm.openai import openai_complete_if_cache, openai_embed
-    from lightrag.utils import EmbeddingFunc
+   AZURE_EMBEDDING_DEPLOYMENT=your-embedding-deployment
+   AZURE_EMBEDDING_API_VERSION=2023-05-15
+   EMBEDDING_DIM=1536
+   ```
 
-    # 讀取環境變數
-    api_key = os.getenv("LLM_BINDING_API_KEY")
-    base_url = os.getenv("LLM_BINDING_HOST")
-    api_version = os.getenv("AZURE_OPENAI_API_VERSION")
-    deployment = os.getenv("AZURE_OPENAI_DEPLOYMENT")
+2. **執行整合測試腳本**（會依序驗證：LLM、Embedding、RAG 流程）：
 
-    # 測試 LLM 連線
-    def test_llm_connection():
-        try:
-            result = openai_complete_if_cache(
-                deployment,  # Azure 使用 deployment 名稱
-                "Hello, this is a test.",
-                api_key=api_key,
-                base_url=base_url,
-                api_version=api_version,
-            )
-            print(f"LLM 連線成功: {result[:100]}...")
-            return True
-        except Exception as e:
-            print(f"LLM 連線失敗: {e}")
-            return False
+   ```powershell
+   python eval/integration/azure_openai_integration_smoketest.py `
+     --doc eval/docs/test-01.txt `
+     --working-dir eval/integration/rag_storage_azure_eval `
+     --mode hybrid
+   ```
 
-    # 測試 Embedding 連線
-    def test_embedding_connection():
-        try:
-            embeddings = openai_embed(
-                ["test text"],
-                model=os.getenv("AZURE_EMBEDDING_DEPLOYMENT", "text-embedding-3-large"),
-                api_key=api_key,
-                base_url=base_url,
-                api_version=os.getenv("AZURE_EMBEDDING_API_VERSION", "2023-05-15"),
-            )
-            print(f"Embedding 連線成功: 維度 {len(embeddings[0])}")
-            return True
-        except Exception as e:
-            print(f"Embedding 連線失敗: {e}")
-            return False
-
-    # 執行測試
-    test_llm_connection()
-    test_embedding_connection()
-    ```
-
-3. **完整功能測試**：
-    ```python
-    # 使用 Azure OpenAI 初始化 RAGAnything
-    def llm_model_func(prompt, system_prompt=None, history_messages=[], **kwargs):
-        return openai_complete_if_cache(
-            deployment,  # 使用 deployment 名稱而非模型名稱
-            prompt,
-            system_prompt=system_prompt,
-            history_messages=history_messages,
-            api_key=api_key,
-            base_url=base_url,
-            api_version=api_version,
-            **kwargs,
-        )
-
-    embedding_func = EmbeddingFunc(
-        embedding_dim=int(os.getenv("EMBEDDING_DIM", "3072")),
-        max_token_size=8192,
-        func=lambda texts: openai_embed(
-            texts,
-            model=os.getenv("AZURE_EMBEDDING_DEPLOYMENT", "text-embedding-3-large"),
-            api_key=api_key,
-            base_url=base_url,
-            api_version=os.getenv("AZURE_EMBEDDING_API_VERSION", "2023-05-15"),
-        ),
-    )
-
-    rag = RAGAnything(
-        config=config,
-        llm_model_func=llm_model_func,
-        embedding_func=embedding_func,
-    )
-
-    # 測試完整流程
-    await rag.process_document_complete(
-        file_path="test_document.pdf",
-        output_dir="./output"
-    )
-
-    result = await rag.aquery("文件的主要內容是什麼？", mode="hybrid")
-    print(f"查詢結果: {result}")
-    ```
-
-4. **驗證錯誤處理**：
-   - 測試錯誤的 API Key（應返回 401 錯誤）
-   - 測試錯誤的 Deployment 名稱（應返回 404 錯誤）
-   - 測試錯誤的 API 版本（應返回適當錯誤訊息）
-   - 驗證錯誤訊息是否清晰易懂
-
-5. **效能測試**：
-   - 比較 Azure OpenAI 與標準 OpenAI API 的響應時間
-   - 測試並發請求的處理能力
-   - 驗證速率限制（rate limiting）的處理
+3. **常見錯誤對照**：
+   - **401**：`LLM_BINDING_API_KEY` 錯誤
+   - **404 / deployment not found**：`AZURE_OPENAI_DEPLOYMENT` 或 `AZURE_EMBEDDING_DEPLOYMENT` 錯誤（Azure 用的是 deployment name）
+   - **api-version 不支援**：`AZURE_OPENAI_API_VERSION` / `AZURE_EMBEDDING_API_VERSION` 不匹配資源設定
 
 **驗收標準：**
 - LLM 與 Embedding 連線成功率 100%
@@ -638,6 +398,8 @@ RAG-Anything 目前為**純開源專案**，未提供企業版或雲端版。所
 ---
 
 ### 6.2 穩定性與效能測試
+
+> 本報告依需求 **跳過「穩定性與效能測試」**，本章不執行、不驗收。
 
 #### 6.2.1 長時間運行穩定性
 
@@ -1029,69 +791,37 @@ RAG-Anything 目前為**純開源專案**，未提供企業版或雲端版。所
 - 驗證 API 的穩定性與效能
 - 確認認證與授權機制正確
 
-**測試方法：**
+**測試方法（提供完整可跑 FastAPI 範例 + client）：**
 
-1. **建立 API 服務**（如使用 FastAPI）：
-    ```python
-    from fastapi import FastAPI, HTTPException
-    from pydantic import BaseModel
-    from raganything import RAGAnything
+> 認證（auth）先用 **API Key（X-API-Key header）**，避免牽涉 OAuth/SSO；如你需要 OAuth，我可以再補。
 
-    app = FastAPI()
-    rag = RAGAnything(...)  # 初始化
+1. **安裝整合範例依賴**：
 
-    class QueryRequest(BaseModel):
-        query: str
-        mode: str = "hybrid"
+   ```bash
+   pip install -r eval/integration/requirements-integration.txt
+   ```
 
-    class ProcessRequest(BaseModel):
-        file_path: str
-        output_dir: str = "./output"
+2. **啟動 API 服務（FastAPI）**：
+   - 需先設定環境變數：`RAG_API_KEY`、`LLM_BINDING_API_KEY`（以及可選 `LLM_BINDING_HOST`）
 
-    @app.post("/api/query")
-    async def query(request: QueryRequest):
-        try:
-            result = await rag.aquery(request.query, mode=request.mode)
-            return {"result": result, "status": "success"}
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
+   ```powershell
+   $env:RAG_API_KEY = "change-me"
+   $env:LLM_BINDING_API_KEY = "your_api_key"
+   $env:LLM_BINDING_HOST = "https://api.openai.com/v1"
 
-    @app.post("/api/process")
-    async def process_document(request: ProcessRequest):
-        try:
-            await rag.process_document_complete(
-                file_path=request.file_path,
-                output_dir=request.output_dir
-            )
-            return {"status": "success"}
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=str(e))
-    ```
+   uvicorn eval.integration.api_service_fastapi:app --host 0.0.0.0 --port 8000
+   ```
 
-2. **測試 API 端點**：
-    ```python
-    import requests
+3. **用 client 驗證 API（插入文字 → 查詢）**：
 
-    # 測試查詢 API
-    response = requests.post(
-        "http://localhost:8000/api/query",
-        json={"query": "文件內容是什麼？", "mode": "hybrid"}
-    )
-    assert response.status_code == 200
-    print(response.json())
+   ```bash
+   python eval/integration/api_client_example.py --base-url http://localhost:8000 --api-key change-me
+   ```
 
-    # 測試處理 API
-    response = requests.post(
-        "http://localhost:8000/api/process",
-        json={"file_path": "test.pdf", "output_dir": "./output"}
-    )
-    assert response.status_code == 200
-    ```
-
-3. **整合測試**：
-   - 與現有系統的實際整合測試
-   - 驗證資料格式相容性
-   - 測試認證機制（如 API Key、OAuth）
+4. **介面摘要（可直接對接既有系統）**：
+   - `POST /v1/insert_text`：插入純文字（container-friendly，不依賴 parser）
+   - `POST /v1/process_file`：處理伺服器本機檔案（需要 parser 與檔案可見）
+   - `POST /v1/query`：查詢（支援 `mode`，可選 `vlm_enhanced`）
 
 **驗收標準：**
 - API 端點正常運作
@@ -1109,72 +839,37 @@ RAG-Anything 目前為**純開源專案**，未提供企業版或雲端版。所
 - 驗證各後端的效能差異
 - 確認功能在各後端下一致
 
-**測試方法：**
+**測試方法（限定：本地檔案系統 vs PostgreSQL）：**
 
-1. **測試不同後端配置**：
-    ```python
-    # 測試本地檔案系統（預設）
-    rag_local = RAGAnything(
-        config=RAGAnythingConfig(working_dir="./rag_storage_local"),
-        ...
-    )
+> 注意：本專案的 PostgreSQL 切換採用 LightRAG 的 storage class 選擇方式（`LIGHTRAG_*_STORAGE=PG*Storage`），而不是 `lightrag_kwargs={"kv_storage":"postgres"}` 這種字串。
 
-    # 測試 PostgreSQL
-    import os
-    os.environ.update({
-        "POSTGRES_HOST": "localhost",
-        "POSTGRES_PORT": "5432",
-        "POSTGRES_USER": "rag_user",
-        "POSTGRES_PASSWORD": "password",
-        "POSTGRES_DATABASE": "rag_db",
-    })
+1. **啟動 PostgreSQL（建議用 pgvector 影像）**：
 
-    rag_postgres = RAGAnything(
-        config=RAGAnythingConfig(working_dir="./rag_storage_postgres"),
-        lightrag_kwargs={
-            "kv_storage": "postgres",
-            "vector_storage": "postgres",
-        },
-        ...
-    )
+   - 已提供範例 docker compose：`deploy/docker/docker-compose.yml`
+   - 會在啟動時建立 `vector` extension（`deploy/docker/postgres-init/01_init.sql`）
 
-    # 測試 Neo4j（圖譜儲存）
-    os.environ.update({
-        "NEO4J_URI": "bolt://localhost:7687",
-        "NEO4J_USER": "neo4j",
-        "NEO4J_PASSWORD": "password",
-    })
+2. **設定環境變數（PostgreSQL 連線）**：
 
-    rag_neo4j = RAGAnything(
-        config=RAGAnythingConfig(working_dir="./rag_storage_neo4j"),
-        lightrag_kwargs={
-            "graph_storage": "neo4j",
-        },
-        ...
-    )
-    ```
+   ```powershell
+   $env:POSTGRES_HOST = "localhost"
+   $env:POSTGRES_PORT = "5432"
+   $env:POSTGRES_USER = "rag_user"
+   $env:POSTGRES_PASSWORD = "rag_password"
+   $env:POSTGRES_DATABASE = "rag_db"
+   ```
 
-2. **功能一致性測試**：
-    ```python
-    # 在不同後端執行相同操作
-    test_file = "test_document.pdf"
+3. **執行切換測試腳本（同文件、同查詢）**：
 
-    # 本地檔案系統
-    await rag_local.process_document_complete(test_file, "./output_local")
-    result_local = await rag_local.aquery("測試查詢", mode="hybrid")
+   ```powershell
+   python eval/integration/backend_switch_local_vs_postgres.py `
+     --doc eval/docs/test-01.txt `
+     --mode hybrid `
+     --out-dir eval/integration/results
+   ```
 
-    # PostgreSQL
-    await rag_postgres.process_document_complete(test_file, "./output_postgres")
-    result_postgres = await rag_postgres.aquery("測試查詢", mode="hybrid")
-
-    # 驗證結果一致性
-    assert result_local == result_postgres  # 應相同
-    ```
-
-3. **效能比較**：
-   - 比較各後端的查詢速度
-   - 比較各後端的寫入速度
-   - 比較各後端的資源使用
+4. **產出物**：
+   - `eval/integration/results/backend_switch_local_vs_postgres/<timestamp>/results.json`
+     - 會同時列出 local/pg 的 answer、耗時、以及（best-effort）顯示 LightRAG 實際選到的 storage class 名稱
 
 **驗收標準：**
 - 所有後端功能一致
@@ -1191,89 +886,41 @@ RAG-Anything 目前為**純開源專案**，未提供企業版或雲端版。所
 - 驗證容器間的網路通訊正常
 - 確認容器化部署的穩定性
 
-**測試方法：**
+**測試方法（已提供可直接 build/run 的 Dockerfile + docker-compose）：**
 
-1. **建立 Dockerfile**：
-    ```dockerfile
-    FROM python:3.11-slim
+檔案位置：
+- `deploy/docker/Dockerfile`
+- `deploy/docker/docker-compose.yml`
+- `deploy/docker/postgres-init/01_init.sql`
+- `deploy/docker/env.example`
 
-    WORKDIR /app
+1. **準備環境變數檔**：
+   - 複製 `deploy/docker/env.example` 成你的 `.env`（可放在 `deploy/docker/.env` 或自行 export）
+   - 至少要填：`RAG_API_KEY`、`LLM_BINDING_API_KEY`
+   - 若要測 PostgreSQL 後端，另外打開：
+     - `LIGHTRAG_KV_STORAGE=PGKVStorage`
+     - `LIGHTRAG_VECTOR_STORAGE=PGVectorStorage`
+     - `LIGHTRAG_DOC_STATUS_STORAGE=PGDocStatusStorage`
 
-    # 安裝依賴
-    COPY requirements.txt .
-    RUN pip install --no-cache-dir -r requirements.txt
+2. **啟動 docker compose**（含 API + pgvector PostgreSQL）：
 
-    # 安裝 RAG-Anything
-    COPY . .
-    RUN pip install -e .
+   ```bash
+   # 先將 deploy/docker/env.example 複製成 deploy/docker/.env 並填值，再執行：
+   docker compose --env-file deploy/docker/.env -f deploy/docker/docker-compose.yml up -d --build
+   ```
 
-    # 設定環境變數
-    ENV WORKING_DIR=/app/rag_storage
-    ENV OUTPUT_DIR=/app/output
+3. **用 smoke test 驗證容器內服務可用**（insert_text → query）：
 
-    # 暴露端口（如提供 API）
-    EXPOSE 8000
+   ```bash
+   pip install -r eval/integration/requirements-integration.txt
+   python eval/integration/container_api_smoketest.py --base-url http://localhost:8000 --api-key change-me
+   ```
 
-    # 啟動命令
-    CMD ["python", "app.py"]
-    ```
+4. **停止服務**：
 
-2. **建立 docker-compose.yml**：
-    ```yaml
-    version: '3.8'
-
-    services:
-    raganything:
-        build: .
-        environment:
-        - LLM_BINDING_API_KEY=${LLM_BINDING_API_KEY}
-        - LLM_BINDING_HOST=${LLM_BINDING_HOST}
-        volumes:
-        - ./rag_storage:/app/rag_storage
-        - ./output:/app/output
-        ports:
-        - "8000:8000"
-    
-    postgres:
-        image: postgres:15
-        environment:
-        - POSTGRES_USER=rag_user
-        - POSTGRES_PASSWORD=password
-        - POSTGRES_DB=rag_db
-        volumes:
-        - postgres_data:/var/lib/postgresql/data
-
-    volumes:
-    postgres_data:
-    ```
-
-3. **測試容器部署**：
-    ```bash
-    # 建立容器
-    docker-compose build
-
-    # 啟動服務
-    docker-compose up -d
-
-    # 測試功能
-    docker-compose exec raganything python -c "
-    from raganything import RAGAnything
-    import asyncio
-
-    async def test():
-        rag = RAGAnything(...)
-        result = await rag.aquery('測試', mode='hybrid')
-        print(result)
-
-    asyncio.run(test())
-    "
-
-    # 檢查日誌
-    docker-compose logs raganything
-
-    # 停止服務
-    docker-compose down
-    ```
+   ```bash
+   docker compose -f deploy/docker/docker-compose.yml down
+   ```
 
 **驗收標準：**
 - 容器能正確建立與啟動

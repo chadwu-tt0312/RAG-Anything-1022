@@ -1,0 +1,70 @@
+{
+  "doc": "eval\\docs\\test-01.txt",
+  "labelstudio_export": "eval\\docs\\prj1-text-02-at-2025-12-12.json",
+  "working_dir": "eval\\kg_eval\\_rag_storage\\test-01",
+  "counts": {
+    "gt_entities": 22,
+    "pred_entities": 0,
+    "gt_relations": 3,
+    "pred_relations": 0
+  },
+  "entity_metrics_loose": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0
+  },
+  "relation_metrics_loose": {
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0
+  },
+  "matches": {
+    "entities": [],
+    "relations": []
+  },
+  "diff": {
+    "gt_only_entities": [
+      "2017 年",
+      "BERT",
+      "CNN",
+      "Decoder",
+      "Encoder",
+      "FFN",
+      "GPT",
+      "RNN",
+      "T5",
+      "Transformer",
+      "Vaswani 等人",
+      "ViT",
+      "位置編碼",
+      "值向量",
+      "前饋神經網路",
+      "卷積層",
+      "多頭注意力",
+      "嵌入層",
+      "查詢向量",
+      "注意力機制",
+      "遮罩機制",
+      "鍵向量"
+    ],
+    "pred_only_entities": [],
+    "gt_only_relations": [
+      {
+        "head": "Transformer",
+        "tail": "2017 年"
+      },
+      {
+        "head": "Transformer",
+        "tail": "Vaswani 等人"
+      },
+      {
+        "head": "Transformer",
+        "tail": "注意力機制"
+      }
+    ],
+    "pred_only_relations": []
+  },
+  "notes": {
+    "matching_policy": "loose (entities by name; relations by (head, tail) only; relation_type not required)"
+  }
+}

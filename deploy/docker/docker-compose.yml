@@ -1,0 +1,56 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-rag_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-rag_password}
+      POSTGRES_DB: ${POSTGRES_DB:-rag_db}
+    ports:
+      - "${POSTGRES_PORT_EXPOSED:-5432}:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+      - ./postgres-init:/docker-entrypoint-initdb.d:ro
+
+  rag_api:
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Dockerfile
+    environment:
+      # API auth
+      RAG_API_KEY: ${RAG_API_KEY:-change-me}
+
+      # Storage
+      WORKING_DIR: /data/rag_storage
+      OUTPUT_DIR: /data/output
+
+      # OpenAI-compatible LLM/Embedding
+      LLM_BINDING_API_KEY: ${LLM_BINDING_API_KEY}
+      LLM_BINDING_HOST: ${LLM_BINDING_HOST:-https://api.openai.com/v1}
+      LLM_MODEL: ${LLM_MODEL:-gpt-4o-mini}
+
+      EMBEDDING_MODEL: ${EMBEDDING_MODEL:-text-embedding-3-small}
+      EMBEDDING_DIM: ${EMBEDDING_DIM:-1536}
+
+      # PostgreSQL backend selection (enable when you want PG storages)
+      LIGHTRAG_KV_STORAGE: ${LIGHTRAG_KV_STORAGE:-}
+      LIGHTRAG_VECTOR_STORAGE: ${LIGHTRAG_VECTOR_STORAGE:-}
+      LIGHTRAG_DOC_STATUS_STORAGE: ${LIGHTRAG_DOC_STATUS_STORAGE:-}
+
+      POSTGRES_HOST: ${POSTGRES_HOST:-postgres}
+      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
+      POSTGRES_USER: ${POSTGRES_USER:-rag_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-rag_password}
+      POSTGRES_DATABASE: ${POSTGRES_DB:-rag_db}
+
+    ports:
+      - "${RAG_API_PORT:-8000}:8000"
+    volumes:
+      - rag_data:/data
+    depends_on:
+      - postgres
+
+volumes:
+  pg_data:
+  rag_data:

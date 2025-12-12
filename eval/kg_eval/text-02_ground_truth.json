@@ -1,0 +1,134 @@
+{
+  "entities": {
+    "Transformer": {
+      "entity_type": "TECHNICAL_TERM",
+      "source": "ground_truth",
+      "occurrences": 1
+    },
+    "Vaswani 等人": {
+      "entity_type": "PERSON",
+      "source": "ground_truth",
+      "occurrences": 1
+    },
+    "2017 年": {
+      "entity_type": "DATE",
+      "source": "ground_truth",
+      "occurrences": 1
+    },
+    "RNN": {
+      "entity_type": "TECHNICAL_TERM",
+      "source": "ground_truth",
+      "occurrences": 1
+    },
+    "CNN": {
+      "entity_type": "TECHNICAL_TERM",
+      "source": "ground_truth",
+      "occurrences": 1
+    },
+    "注意力機制": {
+      "entity_type": "TECHNICAL_TERM",
+      "source": "ground_truth",
+      "occurrences": 1
+    },
+    "卷積層": {
+      "entity_type": "SYSTEM_COMPONENT",
+      "source": "ground_truth",
+      "occurrences": 1
+    },
+    "Encoder": {
+      "entity_type": "SYSTEM_COMPONENT",
+      "source": "ground_truth",
+      "occurrences": 1
+    },
+    "Decoder": {
+      "entity_type": "SYSTEM_COMPONENT",
+      "source": "ground_truth",
+      "occurrences": 1
+    },
+    "嵌入層": {
+      "entity_type": "SYSTEM_COMPONENT",
+      "source": "ground_truth",
+      "occurrences": 1
+    },
+    "位置編碼": {
+      "entity_type": "SYSTEM_COMPONENT",
+      "source": "ground_truth",
+      "occurrences": 1
+    },
+    "FFN": {
+      "entity_type": "TECHNICAL_TERM",
+      "source": "ground_truth",
+      "occurrences": 1
+    },
+    "前饋神經網路": {
+      "entity_type": "TECHNICAL_TERM",
+      "source": "ground_truth",
+      "occurrences": 1
+    },
+    "遮罩機制": {
+      "entity_type": "SYSTEM_COMPONENT",
+      "source": "ground_truth",
+      "occurrences": 1
+    },
+    "多頭注意力": {
+      "entity_type": "SYSTEM_COMPONENT",
+      "source": "ground_truth",
+      "occurrences": 1
+    },
+    "查詢向量": {
+      "entity_type": "SYSTEM_COMPONENT",
+      "source": "ground_truth",
+      "occurrences": 1
+    },
+    "鍵向量": {
+      "entity_type": "SYSTEM_COMPONENT",
+      "source": "ground_truth",
+      "occurrences": 1
+    },
+    "值向量": {
+      "entity_type": "SYSTEM_COMPONENT",
+      "source": "ground_truth",
+      "occurrences": 1
+    },
+    "GPT": {
+      "entity_type": "TECHNICAL_TERM",
+      "source": "ground_truth",
+      "occurrences": 1
+    },
+    "T5": {
+      "entity_type": "TECHNICAL_TERM",
+      "source": "ground_truth",
+      "occurrences": 1
+    },
+    "ViT": {
+      "entity_type": "TECHNICAL_TERM",
+      "source": "ground_truth",
+      "occurrences": 1
+    },
+    "BERT": {
+      "entity_type": "TECHNICAL_TERM",
+      "source": "ground_truth",
+      "occurrences": 1
+    }
+  },
+  "relations": {
+    "Transformer::proposes::Vaswani 等人": {
+      "head": "Transformer",
+      "tail": "Vaswani 等人",
+      "relation_type": "proposes",
+      "source": "ground_truth"
+    },
+    "Transformer::proposes::2017 年": {
+      "head": "Transformer",
+      "tail": "2017 年",
+      "relation_type": "proposes",
+      "source": "ground_truth"
+    },
+    "Transformer::contains::注意力機制": {
+      "head": "Transformer",
+      "tail": "注意力機制",
+      "relation_type": "contains",
+      "source": "ground_truth"
+    }
+  }
+}
