@@ -8,23 +8,25 @@ What this verifies:
 Usage:
   python eval/integration/azure_openai_integration_smoketest.py \
     --doc eval/docs/test-01.txt \
-    --working-dir eval/integration/_rag_storage_azure_eval \
+    --working-dir eval/integration/rag_storage_azure_eval \
     --mode hybrid
 
 Required env (LLM):
 - LLM_BINDING_HOST=https://{resource}.openai.azure.com
 - LLM_BINDING_API_KEY=...
-- AZURE_OPENAI_API_VERSION=2024-08-01-preview (example)
+- AZURE_OPENAI_API_VERSION=2024-12-01-preview (example)
 - AZURE_OPENAI_DEPLOYMENT=<your chat deployment name>
 
 Required env (Embedding):
+- AZURE_EMBEDDING_BINDING_HOST=https://{resource}.openai.azure.com (or reuse LLM_BINDING_HOST)
+- AZURE_EMBEDDING_BINDING_API_KEY=... (or reuse LLM_BINDING_API_KEY)
 - AZURE_EMBEDDING_DEPLOYMENT=<your embedding deployment name>
-- AZURE_EMBEDDING_API_VERSION=2023-05-15 (example)
-- EMBEDDING_DIM=1536 (text-embedding-3-small) or 3072 (text-embedding-3-large)
+- AZURE_EMBEDDING_API_VERSION=2024-12-01-preview (example)
+- AZURE_EMBEDDING_DIM=1536 (text-embedding-3-small) or 3072 (text-embedding-3-large)
 
 Notes:
 - In Azure OpenAI, you pass **deployment name** (not model name) to the client.
-- This script uses lightrag.llm.openai wrappers used elsewhere in this repo.
+- This script uses lightrag.llm.azure_openai wrappers for Azure OpenAI support.
 """
 
 from __future__ import annotations
@@ -34,7 +36,7 @@ import asyncio
 import os
 from pathlib import Path
 
-from lightrag.llm.openai import openai_complete_if_cache, openai_embed
+from lightrag.llm.azure_openai import azure_openai_complete_if_cache, azure_openai_embed
 from lightrag.utils import EmbeddingFunc
 
 from raganything import RAGAnything, RAGAnythingConfig
@@ -49,32 +51,40 @@ def _try_load_dotenv() -> None:
         return
 
 
-def _require_env(name: str) -> str:
+def _require_env(name: str, fallback: str | None = None) -> str:
     v = os.getenv(name)
-    if not v:
-        raise RuntimeError(f"Missing env var: {name}")
-    return v
+    if v:
+        return v
+    if fallback:
+        v = os.getenv(fallback)
+        if v:
+            return v
+    raise RuntimeError(f"Missing env var: {name}")
 
 
 def _build_azure_llm_and_embedding():
-    api_key = _require_env("LLM_BINDING_API_KEY")
-    base_url = _require_env("LLM_BINDING_HOST")
-
+    """Build LLM and embedding functions for Azure OpenAI."""
+    # LLM configuration
+    llm_api_key = _require_env("LLM_BINDING_API_KEY")
+    llm_base_url = _require_env("LLM_BINDING_HOST")
     chat_deployment = _require_env("AZURE_OPENAI_DEPLOYMENT")
     chat_api_version = _require_env("AZURE_OPENAI_API_VERSION")
 
+    # Embedding configuration (with fallback to LLM values)
+    emb_base_url = _require_env("AZURE_EMBEDDING_BINDING_HOST", "LLM_BINDING_HOST")
+    emb_api_key = _require_env("AZURE_EMBEDDING_BINDING_API_KEY", "LLM_BINDING_API_KEY")
     emb_deployment = _require_env("AZURE_EMBEDDING_DEPLOYMENT")
     emb_api_version = _require_env("AZURE_EMBEDDING_API_VERSION")
     emb_dim = int(_require_env("AZURE_EMBEDDING_DIM"))
 
     def llm_model_func(prompt, system_prompt=None, history_messages=None, **kwargs):
-        return openai_complete_if_cache(
+        return azure_openai_complete_if_cache(
             chat_deployment,
             prompt,
             system_prompt=system_prompt,
             history_messages=history_messages or [],
-            api_key=api_key,
-            base_url=base_url,
+            api_key=llm_api_key,
+            base_url=llm_base_url,
             api_version=chat_api_version,
             **kwargs,
         )
@@ -82,11 +92,11 @@ def _build_azure_llm_and_embedding():
     embedding_func = EmbeddingFunc(
         embedding_dim=emb_dim,
         max_token_size=8192,
-        func=lambda texts: openai_embed(
+        func=lambda texts: azure_openai_embed(
             texts,
             model=emb_deployment,
-            api_key=api_key,
-            base_url=base_url,
+            base_url=emb_base_url,
+            api_key=emb_api_key,
             api_version=emb_api_version,
         ),
     )
@@ -104,14 +114,17 @@ async def main(args: argparse.Namespace) -> int:
     llm_model_func, embedding_func = _build_azure_llm_and_embedding()
 
     # 1) LLM quick check
-    llm_out = await llm_model_func("請用一句話說明 Transformer 的核心創新是什麼？")
+    print("[TEST] LLM Chat Completion...")
+    llm_out = await llm_model_func("Say 'Azure OpenAI LLM test successful!' in one sentence.")
     print("[LLM OK]", str(llm_out)[:120])
 
     # 2) Embedding quick check
+    print("\n[TEST] Embedding...")
     emb = await embedding_func(["hello", "world"])
     print("[Embedding OK] dim=", len(emb[0]))
 
     # 3) End-to-end RAG
+    print("\n[TEST] End-to-end RAG...")
     cfg = RAGAnythingConfig(
         working_dir=str(Path(args.working_dir).resolve()),
         parser=os.getenv("PARSER", "mineru"),
@@ -145,6 +158,7 @@ async def main(args: argparse.Namespace) -> int:
     )
     print("[RAG OK]", answer[:300])
 
+    print("\n[SUCCESS] All Azure OpenAI integration tests passed!")
     return 0
 
 

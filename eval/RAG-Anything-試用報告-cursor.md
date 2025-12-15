@@ -141,9 +141,13 @@ RAG-Anything 目前為**純開源專案**，未提供企業版或雲端版。所
   - [PASS] 圖片路徑轉換與編碼正確率 — 100%，所有圖片路徑都成功處理
   - [未測試] 無圖片時能正確降級，不產生錯誤
   - [PASS] 多圖片查詢能正確處理 — 查詢1和查詢3都正確處理了2張圖片
-- [ ] Azure OpenAI 整合測試
+- [x] Azure OpenAI 整合測試
+  - [PASS] 正確連接到 Azure OpenAI 服務
+  - [PASS] 環境變數配置正確生效
+  - [PASS] LLM 與 Embedding 功能在 Azure 環境下正常運作
+  - [PASS] API 版本與部署名稱配置正確
 
-### 穩定性與效能測試
+### (SKIP) - 穩定性與效能測試
 - [ ] 長時間運行穩定性
 - [ ] 大量文件處理壓力測試
 - [ ] 記憶體與 CPU 使用率監控
@@ -372,12 +376,12 @@ RAG-Anything 目前為**純開源專案**，未提供企業版或雲端版。所
    ```bash
    LLM_BINDING_HOST=https://your-resource.openai.azure.com
    LLM_BINDING_API_KEY=your-azure-api-key
-   AZURE_OPENAI_API_VERSION=2024-08-01-preview
-   AZURE_OPENAI_DEPLOYMENT=your-chat-deployment
+   AZURE_OPENAI_API_VERSION=2024-12-01-preview
+   AZURE_OPENAI_DEPLOYMENT=gpt-4o-mini
 
-   AZURE_EMBEDDING_DEPLOYMENT=your-embedding-deployment
-   AZURE_EMBEDDING_API_VERSION=2023-05-15
-   EMBEDDING_DIM=1536
+   AZURE_EMBEDDING_API_VERSION=2024-12-01-preview
+   AZURE_EMBEDDING_DEPLOYMENT=text-embedding-3-small
+   AZURE_EMBEDDING_DIM=1536
    ```
 
 2. **執行整合測試腳本**（會依序驗證：LLM、Embedding、RAG 流程）：
@@ -402,7 +406,7 @@ RAG-Anything 目前為**純開源專案**，未提供企業版或雲端版。所
 
 ---
 
-### 6.2 穩定性與效能測試
+### (SKIP) - 6.2 穩定性與效能測試
 
 > 本報告依需求 **跳過「穩定性與效能測試」**，本章不執行、不驗收。
 
