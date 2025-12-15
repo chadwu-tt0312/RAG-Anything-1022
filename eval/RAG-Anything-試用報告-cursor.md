@@ -126,16 +126,21 @@ RAG-Anything 目前為**純開源專案**，未提供企業版或雲端版。所
 - [x] 批次處理效能測試
 - [x] 知識圖譜建立正確性驗證
   - 已改用 **Label Studio** 進行「實體 + 關係」標註並匯出 JSON，可與 RAG-Anything 輸出比對（見 `eval/test_data_preparation_guide.md`）
-  - 實體提取精確率（Precision）= 0% (entity_metrics_loose)
-  - 實體提取召回率（Recall）= 0%
-  - 關係提取精確率（Precision）= 0% (relation_metrics_loose)
-  - 關係提取召回率（Recall）= 0%
+  - [FAIL] 實體提取精確率（Precision）= 0% (entity_metrics_loose)
+  - [FAIL] 實體提取召回率（Recall）= 0%
+  - [FAIL] 關係提取精確率（Precision）= 0% (relation_metrics_loose)
+  - [FAIL] 關係提取召回率（Recall）= 0%
 - [x] 混合檢索模式準確度測試
   - [PASS] Hybrid 模式在複雜查詢上的平均分數 >= 0.70
   - [PASS] Hybrid 模式優於至少一種單一模式的比例 >= 30% (實際: 50.0%)
   - [PASS] 所有模式的回應時間都在可接受範圍內 (<=30秒)
   - [PASS] Hybrid 模式平均檢索到足夠的上下文項目 (>=5, 實際: 44.1)
-- [ ] VLM 增強查詢功能測試
+- [x] VLM 增強查詢功能測試
+  - [PASS] VLM 增強查詢能正確識別圖片內容 — 所有查詢都正確識別並分析了圖片內容
+  - [PASS] VLM 增強查詢的回應品質優於純文字查詢 — 提供更詳細的數值與視覺細節
+  - [PASS] 圖片路徑轉換與編碼正確率 — 100%，所有圖片路徑都成功處理
+  - [未測試] 無圖片時能正確降級，不產生錯誤
+  - [PASS] 多圖片查詢能正確處理 — 查詢1和查詢3都正確處理了2張圖片
 - [ ] Azure OpenAI 整合測試
 
 ### 穩定性與效能測試
@@ -326,7 +331,7 @@ RAG-Anything 目前為**純開源專案**，未提供企業版或雲端版。所
 2. **執行測試腳本（同題目 VLM on/off 對照）**：
 
    ```powershell
-   python eval/integration/vlm_enhanced_query_eval.py `
+   uv run eval/integration/vlm_enhanced_query_eval.py `
      --docs eval/docs/全球資訊服務暨軟體市場規模.png eval/docs/cat-01.jpg `
      --working-dir eval/integration/rag_storage_vlm_eval `
      --out-dir eval/integration/results `
@@ -378,7 +383,7 @@ RAG-Anything 目前為**純開源專案**，未提供企業版或雲端版。所
 2. **執行整合測試腳本**（會依序驗證：LLM、Embedding、RAG 流程）：
 
    ```powershell
-   python eval/integration/azure_openai_integration_smoketest.py `
+   uv run eval/integration/azure_openai_integration_smoketest.py `
      --doc eval/docs/test-01.txt `
      --working-dir eval/integration/rag_storage_azure_eval `
      --mode hybrid
@@ -815,7 +820,7 @@ RAG-Anything 目前為**純開源專案**，未提供企業版或雲端版。所
 3. **用 client 驗證 API（插入文字 → 查詢）**：
 
    ```bash
-   python eval/integration/api_client_example.py --base-url http://localhost:8000 --api-key change-me
+   uv run eval/integration/api_client_example.py --base-url http://localhost:8000 --api-key change-me
    ```
 
 4. **介面摘要（可直接對接既有系統）**：
@@ -861,7 +866,7 @@ RAG-Anything 目前為**純開源專案**，未提供企業版或雲端版。所
 3. **執行切換測試腳本（同文件、同查詢）**：
 
    ```powershell
-   python eval/integration/backend_switch_local_vs_postgres.py `
+   uv run eval/integration/backend_switch_local_vs_postgres.py `
      --doc eval/docs/test-01.txt `
      --mode hybrid `
      --out-dir eval/integration/results
@@ -913,7 +918,7 @@ RAG-Anything 目前為**純開源專案**，未提供企業版或雲端版。所
 
    ```bash
    pip install -r eval/integration/requirements-integration.txt
-   python eval/integration/container_api_smoketest.py --base-url http://localhost:8000 --api-key change-me
+   uv run eval/integration/container_api_smoketest.py --base-url http://localhost:8000 --api-key change-me
    ```
 
 4. **停止服務**：

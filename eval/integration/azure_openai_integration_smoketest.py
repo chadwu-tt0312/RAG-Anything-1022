@@ -65,7 +65,7 @@ def _build_azure_llm_and_embedding():
 
     emb_deployment = _require_env("AZURE_EMBEDDING_DEPLOYMENT")
     emb_api_version = _require_env("AZURE_EMBEDDING_API_VERSION")
-    emb_dim = int(_require_env("EMBEDDING_DIM"))
+    emb_dim = int(_require_env("AZURE_EMBEDDING_DIM"))
 
     def llm_model_func(prompt, system_prompt=None, history_messages=None, **kwargs):
         return openai_complete_if_cache(
@@ -104,11 +104,11 @@ async def main(args: argparse.Namespace) -> int:
     llm_model_func, embedding_func = _build_azure_llm_and_embedding()
 
     # 1) LLM quick check
-    llm_out = llm_model_func("請用一句話說明 Transformer 的核心創新是什麼？")
+    llm_out = await llm_model_func("請用一句話說明 Transformer 的核心創新是什麼？")
     print("[LLM OK]", str(llm_out)[:120])
 
     # 2) Embedding quick check
-    emb = embedding_func(["hello", "world"])
+    emb = await embedding_func(["hello", "world"])
     print("[Embedding OK] dim=", len(emb[0]))
 
     # 3) End-to-end RAG
