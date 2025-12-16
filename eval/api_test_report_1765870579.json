@@ -1,0 +1,1823 @@
+{
+  "summary": {
+    "total_tests": 288,
+    "total_success": 288,
+    "total_failure": 0,
+    "success_rate": 100.0,
+    "total_duration": 323.2738447189331
+  },
+  "suites": [
+    {
+      "name": "health_check",
+      "test_count": 1,
+      "success_count": 1,
+      "failure_count": 0,
+      "success_rate": 100.0,
+      "total_duration": 2.1028287410736084,
+      "avg_duration": 2.1028287410736084,
+      "p95_duration": 2.1028287410736084,
+      "results": [
+        {
+          "name": "health_check",
+          "success": true,
+          "duration": 2.1028287410736084,
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "authentication",
+      "test_count": 3,
+      "success_count": 3,
+      "failure_count": 0,
+      "success_rate": 100.0,
+      "total_duration": 0.023180484771728516,
+      "avg_duration": 0.007726828257242839,
+      "p95_duration": 0.01256108283996582,
+      "results": [
+        {
+          "name": "auth_valid_key",
+          "success": true,
+          "duration": 0.004972934722900391,
+          "error": null
+        },
+        {
+          "name": "auth_invalid_key",
+          "success": true,
+          "duration": 0.005646467208862305,
+          "error": null
+        },
+        {
+          "name": "auth_missing_key",
+          "success": true,
+          "duration": 0.01256108283996582,
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "error_handling",
+      "test_count": 3,
+      "success_count": 3,
+      "failure_count": 0,
+      "success_rate": 100.0,
+      "total_duration": 0.032849788665771484,
+      "avg_duration": 0.010949929555257162,
+      "p95_duration": 0.01562190055847168,
+      "results": [
+        {
+          "name": "error_missing_params",
+          "success": true,
+          "duration": 0.010877132415771484,
+          "error": null
+        },
+        {
+          "name": "error_invalid_mode",
+          "success": true,
+          "duration": 0.01562190055847168,
+          "error": null
+        },
+        {
+          "name": "error_nonexistent_file",
+          "success": true,
+          "duration": 0.00635075569152832,
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "integration_tests",
+      "test_count": 6,
+      "success_count": 6,
+      "failure_count": 0,
+      "success_rate": 100.0,
+      "total_duration": 5.755831718444824,
+      "avg_duration": 0.9593052864074707,
+      "p95_duration": 4.612198829650879,
+      "results": [
+        {
+          "name": "health_check",
+          "success": true,
+          "duration": 0.005916118621826172,
+          "error": null
+        },
+        {
+          "name": "get_stats",
+          "success": true,
+          "duration": 0.002032756805419922,
+          "error": null
+        },
+        {
+          "name": "insert_text",
+          "success": true,
+          "duration": 4.612198829650879,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.39524030685424805,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3716776371002197,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.36876606941223145,
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "concurrent_tests",
+      "test_count": 10,
+      "success_count": 10,
+      "failure_count": 0,
+      "success_rate": 100.0,
+      "total_duration": 5.60720157623291,
+      "avg_duration": 3.7743831634521485,
+      "p95_duration": 5.554072141647339,
+      "results": [
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.4297983646392822,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 2.647810935974121,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 3.012711763381958,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 3.3294835090637207,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 3.776066780090332,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 4.129127740859985,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 4.562175035476685,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 4.954297780990601,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 5.348287582397461,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 5.554072141647339,
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "performance_tests",
+      "test_count": 20,
+      "success_count": 20,
+      "failure_count": 0,
+      "success_rate": 100.0,
+      "total_duration": 7.821093559265137,
+      "avg_duration": 0.3910546779632568,
+      "p95_duration": 0.44680237770080566,
+      "results": [
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.4146401882171631,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3815879821777344,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3631870746612549,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.44680237770080566,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.41303014755249023,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.38364338874816895,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.38593029975891113,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.431577205657959,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.38269567489624023,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.4350893497467041,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3653862476348877,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3645327091217041,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.41652917861938477,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3802073001861572,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3414616584777832,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.35698509216308594,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3607151508331299,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.395266056060791,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.39351701736450195,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.4083094596862793,
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "stability_tests",
+      "test_count": 245,
+      "success_count": 245,
+      "failure_count": 0,
+      "success_rate": 100.0,
+      "total_duration": 301.9308588504791,
+      "avg_duration": 0.7314983932339415,
+      "p95_duration": 1.676713466644287,
+      "results": [
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.40648794174194336,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.413738489151001,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.37851881980895996,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3991048336029053,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3745155334472656,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.4520604610443115,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.36864757537841797,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.4326779842376709,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.381502628326416,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.36693739891052246,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.37989187240600586,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3889639377593994,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.37182021141052246,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.43679189682006836,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.38419222831726074,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3635680675506592,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3749837875366211,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3944520950317383,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.43056654930114746,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.35730671882629395,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3868827819824219,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.35874485969543457,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.36995840072631836,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.35930657386779785,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.4068777561187744,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.4186065196990967,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.38376927375793457,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3957376480102539,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3828256130218506,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3389410972595215,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3845710754394531,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3613288402557373,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3742198944091797,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.45484232902526855,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.4377248287200928,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.40492820739746094,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.36244845390319824,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3867766857147217,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.38756632804870605,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.36081886291503906,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.38103747367858887,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.37477636337280273,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.4561910629272461,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.38651442527770996,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3769674301147461,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.36229705810546875,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.37503600120544434,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.39028143882751465,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3762381076812744,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.39060091972351074,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.41855406761169434,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3732149600982666,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.39292430877685547,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3848085403442383,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.36000680923461914,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3994431495666504,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.36995649337768555,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.4065675735473633,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.4609215259552002,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3716156482696533,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3835127353668213,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.39952898025512695,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3664281368255615,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3887348175048828,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.37288904190063477,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3873250484466553,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.39548826217651367,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.36442112922668457,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.406879186630249,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.4003174304962158,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.4058234691619873,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.39801478385925293,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.8302567005157471,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.7704463005065918,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.2111754417419434,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.8110301494598389,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.1945242881774902,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.616718053817749,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.6387083530426025,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.8875095844268799,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.9886603355407715,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.468160629272461,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.8916032314300537,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.8888165950775146,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.224574089050293,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.1869590282440186,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.4555778503417969,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.7346341609954834,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.8330748081207275,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.8709683418273926,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.6166012287139893,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.6328704357147217,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.1255450248718262,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.9706494808197021,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.3716583251953125,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.272672414779663,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.1070477962493896,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.8526928424835205,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.6157939434051514,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.8222684860229492,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.9102118015289307,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.7683897018432617,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.2649281024932861,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.000401258468628,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.1447734832763672,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.2077133655548096,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.0881319046020508,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.4708631038665771,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.121830701828003,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.3229105472564697,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.5819497108459473,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.9066102504730225,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.7546179294586182,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.9955935478210449,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.9723203182220459,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.2019951343536377,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.5820920467376709,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.6159806251525879,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.7138056755065918,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.38649415969848633,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3917264938354492,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.41735219955444336,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.38985371589660645,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.379253625869751,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.37874436378479004,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3606257438659668,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.39784717559814453,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.36473894119262695,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3537895679473877,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.39632296562194824,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3844923973083496,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.4007904529571533,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.0786216259002686,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.9592695236206055,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.7850778102874756,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.1468636989593506,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.2259085178375244,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.6237742900848389,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.4127078056335449,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.4695250988006592,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3630709648132324,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.38849902153015137,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3880188465118408,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.36742234230041504,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.35110950469970703,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.37361764907836914,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.39669132232666016,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.38141751289367676,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3705904483795166,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.4305403232574463,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3777964115142822,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3615241050720215,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.40674901008605957,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.35244107246398926,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.4322988986968994,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3724207878112793,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.4002046585083008,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.43137574195861816,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3573031425476074,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.36641359329223633,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.39078426361083984,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.34165310859680176,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.35169553756713867,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3503091335296631,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3852977752685547,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3592543601989746,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.38460278511047363,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.36740875244140625,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3996584415435791,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3724091053009033,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.42450618743896484,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.4061298370361328,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.37888145446777344,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.40749645233154297,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.39053797721862793,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.37662458419799805,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3651852607727051,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.4215092658996582,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.3789479732513428,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.38654518127441406,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.4105229377746582,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.7504558563232422,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.0478765964508057,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.490039587020874,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.2344224452972412,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.5736775398254395,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.721357822418213,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.2074871063232422,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.6167411804199219,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.6574208736419678,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.3345508575439453,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.1171822547912598,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.6273825168609619,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.7473952770233154,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.052474021911621,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.4676353931427002,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.1396186351776123,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.709817886352539,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.9319906234741211,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.549250602722168,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.8984777927398682,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.147956371307373,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.8911314010620117,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 2.2560760974884033,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.7201933860778809,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.4591667652130127,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.78031325340271,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.430171251296997,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.3412530422210693,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.616832971572876,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.5945990085601807,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.6719844341278076,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.6926774978637695,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.7374417781829834,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.9074933528900146,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.8267993927001953,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.1039624214172363,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.9809556007385254,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.4631240367889404,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.9461588859558105,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.5116212368011475,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.7327735424041748,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.3471157550811768,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.3989815711975098,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.474545955657959,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.8143317699432373,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.6571269035339355,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.6634366512298584,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.6509909629821777,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.9036221504211426,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.179699420928955,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.651738166809082,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.155137062072754,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.9046177864074707,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.3518640995025635,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.6793513298034668,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.5873820781707764,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.5860915184020996,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.5714144706726074,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.54707932472229,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 0.6092398166656494,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.1194274425506592,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.2845149040222168,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.676713466644287,
+          "error": null
+        },
+        {
+          "name": "query",
+          "success": true,
+          "duration": 1.7242586612701416,
+          "error": null
+        }
+      ]
+    }
+  ]
+}

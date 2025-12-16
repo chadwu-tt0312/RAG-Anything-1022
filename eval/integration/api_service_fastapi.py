@@ -28,17 +28,28 @@ Storage:
 from __future__ import annotations
 
 import asyncio
+import logging
 import os
+import time
 from pathlib import Path
 from typing import Any, Dict, Optional
 
-from fastapi import Depends, FastAPI, Header, HTTPException
-from pydantic import BaseModel, Field
+from fastapi import Depends, FastAPI, Header, HTTPException, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field, field_validator
 
 from lightrag.llm.openai import openai_complete_if_cache, openai_embed
 from lightrag.utils import EmbeddingFunc
 
 from raganything import RAGAnything, RAGAnythingConfig
+
+# 設定日誌
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
+logger = logging.getLogger(__name__)
 
 try:
     from dotenv import load_dotenv
@@ -49,6 +60,71 @@ except Exception:
 
 
 app = FastAPI(title="RAG-Anything Integration API", version="0.1")
+
+# 啟用 CORS（可根據需求調整）
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # 生產環境應限制特定來源
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# 效能監控：追蹤請求統計
+_request_stats = {
+    "total_requests": 0,
+    "successful_requests": 0,
+    "failed_requests": 0,
+    "total_duration": 0.0,
+}
+_stats_lock = asyncio.Lock()
+
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    """記錄請求並追蹤效能"""
+    start_time = time.time()
+    global _request_stats
+
+    # 記錄請求
+    logger.info(f"{request.method} {request.url.path}")
+
+    try:
+        response = await call_next(request)
+        duration = time.time() - start_time
+
+        async with _stats_lock:
+            _request_stats["total_requests"] += 1
+            if response.status_code < 400:
+                _request_stats["successful_requests"] += 1
+            else:
+                _request_stats["failed_requests"] += 1
+            _request_stats["total_duration"] += duration
+
+        # 記錄響應時間
+        logger.info(
+            f"{request.method} {request.url.path} - {response.status_code} ({duration:.3f}s)"
+        )
+
+        return response
+    except Exception as e:
+        duration = time.time() - start_time
+        logger.error(f"{request.method} {request.url.path} - Error: {str(e)} ({duration:.3f}s)")
+        async with _stats_lock:
+            _request_stats["total_requests"] += 1
+            _request_stats["failed_requests"] += 1
+            _request_stats["total_duration"] += duration
+        raise
+
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    """全域異常處理器"""
+    logger.error(f"Unhandled exception: {str(exc)}", exc_info=True)
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Internal server error", "error": str(exc)},
+    )
 
 
 class InsertTextRequest(BaseModel):
@@ -63,9 +139,17 @@ class ProcessFileRequest(BaseModel):
 
 
 class QueryRequest(BaseModel):
-    query: str
-    mode: str = "hybrid"
-    vlm_enhanced: bool = False
+    query: str = Field(min_length=1, description="查詢問題")
+    mode: str = Field(default="hybrid", description="查詢模式: naive, local, global, hybrid")
+    vlm_enhanced: bool = Field(default=False, description="是否使用 VLM 增強")
+
+    @field_validator("mode")
+    @classmethod
+    def validate_mode(cls, v: str) -> str:
+        valid_modes = ["naive", "local", "global", "hybrid"]
+        if v not in valid_modes:
+            raise ValueError(f"mode must be one of {valid_modes}, got {v}")
+        return v
 
 
 class QueryResponse(BaseModel):
@@ -74,6 +158,14 @@ class QueryResponse(BaseModel):
 
 class StatusResponse(BaseModel):
     status: str
+
+
+class StatsResponse(BaseModel):
+    total_requests: int
+    successful_requests: int
+    failed_requests: int
+    average_duration: float
+    success_rate: float
 
 
 _rag: Optional[RAGAnything] = None
@@ -159,45 +251,140 @@ async def _auth(x_api_key: Optional[str] = Header(default=None, alias="X-API-Key
 
 @app.get("/health", response_model=StatusResponse)
 async def health() -> StatusResponse:
+    """健康檢查端點（不需要認證）"""
     return StatusResponse(status="ok")
+
+
+@app.get("/v1/stats", response_model=StatsResponse, dependencies=[Depends(_auth)])
+async def get_stats() -> StatsResponse:
+    """取得 API 統計資訊（需要認證）"""
+    async with _stats_lock:
+        total = _request_stats["total_requests"]
+        if total == 0:
+            avg_duration = 0.0
+            success_rate = 0.0
+        else:
+            avg_duration = _request_stats["total_duration"] / total
+            success_rate = (_request_stats["successful_requests"] / total) * 100
+
+        return StatsResponse(
+            total_requests=_request_stats["total_requests"],
+            successful_requests=_request_stats["successful_requests"],
+            failed_requests=_request_stats["failed_requests"],
+            average_duration=avg_duration,
+            success_rate=success_rate,
+        )
 
 
 @app.post("/v1/insert_text", response_model=StatusResponse, dependencies=[Depends(_auth)])
 async def insert_text(req: InsertTextRequest) -> StatusResponse:
-    rag = await _get_rag()
-    async with _rag_lock:
-        await rag._ensure_lightrag_initialized()
-        await rag.lightrag.ainsert(
-            input=req.text,
-            ids=req.doc_id,
-            file_paths=req.file_path,
-        )
-        await rag.lightrag.finalize_storages()
-    return StatusResponse(status="success")
+    """插入文字內容到知識庫"""
+    try:
+        rag = await _get_rag()
+        async with _rag_lock:
+            await rag._ensure_lightrag_initialized()
+            await rag.lightrag.ainsert(
+                input=req.text,
+                ids=req.doc_id,
+                file_paths=req.file_path,
+            )
+            await rag.lightrag.finalize_storages()
+        logger.info(f"Successfully inserted text (doc_id: {req.doc_id})")
+        return StatusResponse(status="success")
+    except Exception as e:
+        logger.error(f"Error inserting text: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to insert text: {str(e)}")
 
 
 @app.post("/v1/process_file", response_model=StatusResponse, dependencies=[Depends(_auth)])
 async def process_file(req: ProcessFileRequest) -> StatusResponse:
-    rag = await _get_rag()
-    file_path = Path(req.file_path).resolve()
-    if not file_path.exists():
-        raise HTTPException(status_code=400, detail=f"File not found: {file_path}")
+    """處理檔案並插入到知識庫"""
+    try:
+        rag = await _get_rag()
+        file_path = Path(req.file_path).resolve()
+        if not file_path.exists():
+            raise HTTPException(status_code=400, detail=f"File not found: {file_path}")
 
-    out_dir = Path(os.getenv("OUTPUT_DIR", "./output")).resolve()
-    out_dir.mkdir(parents=True, exist_ok=True)
+        # 驗證 parse_method
+        valid_methods = ["auto", "layout", "ocr"]
+        if req.parse_method not in valid_methods:
+            raise HTTPException(
+                status_code=400,
+                detail=f"parse_method must be one of {valid_methods}, got {req.parse_method}",
+            )
 
-    async with _rag_lock:
-        await rag.process_document_complete(
-            file_path=str(file_path),
-            output_dir=str(out_dir),
-            parse_method=req.parse_method,
-        )
-    return StatusResponse(status="success")
+        out_dir = Path(os.getenv("OUTPUT_DIR", "./output")).resolve()
+        out_dir.mkdir(parents=True, exist_ok=True)
+
+        logger.info(f"Processing file: {file_path} (method: {req.parse_method})")
+        async with _rag_lock:
+            await rag.process_document_complete(
+                file_path=str(file_path),
+                output_dir=str(out_dir),
+                parse_method=req.parse_method,
+            )
+        logger.info(f"Successfully processed file: {file_path}")
+        return StatusResponse(status="success")
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error processing file: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to process file: {str(e)}")
 
 
 @app.post("/v1/query", response_model=QueryResponse, dependencies=[Depends(_auth)])
 async def query(req: QueryRequest) -> QueryResponse:
-    rag = await _get_rag()
-    async with _rag_lock:
-        result = await rag.aquery(req.query, mode=req.mode, vlm_enhanced=req.vlm_enhanced)
-    return QueryResponse(result=result)
+    """查詢知識庫"""
+    try:
+        rag = await _get_rag()
+        logger.info(f"Query: {req.query[:100]}... (mode: {req.mode}, vlm: {req.vlm_enhanced})")
+        async with _rag_lock:
+            result = await rag.aquery(req.query, mode=req.mode, vlm_enhanced=req.vlm_enhanced)
+
+        # 處理 None 或空字串的情況 - 確保 result 始終是有效的字串
+        default_message = (
+            "抱歉，無法找到相關的答案。請確認知識庫中已包含相關內容，或嘗試使用不同的查詢方式。"
+        )
+
+        # 統一處理：將 result 轉換為有效的字串
+        if result is None:
+            logger.warning(
+                "Query returned None - knowledge base may be empty or no relevant content found"
+            )
+            result = default_message
+        elif not isinstance(result, str):
+            logger.warning(f"Query returned unexpected type: {type(result)}, converting to string")
+            try:
+                result = str(result) if result is not None else default_message
+            except Exception:
+                result = default_message
+
+        # 確保 result 是字串類型
+        if not isinstance(result, str):
+            result = default_message
+
+        # 處理空字串或只有空白字元的情況
+        if not result or not result.strip():
+            logger.warning("Query returned empty or whitespace-only string")
+            result = default_message
+
+        # 最終驗證：確保 result 是有效的非空字串
+        if not isinstance(result, str) or not result.strip():
+            logger.error(
+                f"Failed to ensure valid result string, result type: {type(result)}, value: {result}"
+            )
+            result = default_message
+
+        logger.info(f"Query completed (result length: {len(result)})")
+        return QueryResponse(result=result)
+    except ValueError as e:
+        # LightRAG 未初始化或知識庫為空
+        error_msg = str(e)
+        logger.error(f"Query validation error: {error_msg}")
+        raise HTTPException(
+            status_code=400,
+            detail=f"Query failed: {error_msg}. Please ensure documents have been processed first.",
+        )
+    except Exception as e:
+        logger.error(f"Error processing query: {str(e)}", exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to process query: {str(e)}")
